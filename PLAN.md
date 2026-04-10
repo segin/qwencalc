@@ -93,9 +93,10 @@ qwencalc/
 - [x] CalculatorWindow implemented
 - [x] ThemeManager implemented
 
-### Phase 3: Integration (Pending)
-- [ ] Main application entry point
-- [ ] Backend + Frontend integration
+### Phase 3: Integration (In Progress)
+- [x] Main application entry point (`src/main.cpp`)
+- [x] Backend + Frontend integration code complete
+- [ ] Build and test on Linux
 - [ ] Keyboard shortcuts working
 - [ ] End-to-end testing
 
