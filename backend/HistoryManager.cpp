@@ -1,16 +1,16 @@
 #include "HistoryManager.h"
-#include <sstream>
 
 namespace qwencalc {
 
 HistoryManager::HistoryManager()
-    : maxEntries(100) {}
+    : maxEntries(50) {
+}
 
 void HistoryManager::addEntry(const std::string& expression, double result) {
     history.push_back(std::make_pair(expression, result));
     
-    if (static_cast<int>(history.size()) > maxEntries) {
-        history.pop_back();
+    while (static_cast<int>(history.size()) > maxEntries) {
+        history.pop_front();
     }
 }
 
@@ -23,41 +23,38 @@ int HistoryManager::size() const {
 }
 
 std::string HistoryManager::getHistory() const {
-    std::stringstream ss;
+    std::string result;
     for (const auto& entry : history) {
-        ss << entry.first << " = " << entry.second << "\n";
+        result += entry.first + " = " + std::to_string(entry.second) + "\n";
     }
-    return ss.str();
+    return result;
 }
 
 std::vector<std::string> HistoryManager::getHistoryList() const {
-    std::vector<std::string> entries;
+    std::vector<std::string> list;
     for (const auto& entry : history) {
-        entries.push_back(entry.first + " = " + std::to_string(entry.second));
+        list.push_back(entry.first + " = " + std::to_string(entry.second));
     }
-    return entries;
+    return list;
 }
 
 double HistoryManager::getLastResult() const {
     if (history.empty()) {
         return 0.0;
     }
-    return history.front().second;
+    return history.back().second;
 }
 
 std::string HistoryManager::getLastEntry() const {
     if (history.empty()) {
         return "";
     }
-    return history.front().first;
+    return history.back().first + " = " + std::to_string(history.back().second);
 }
 
-void HistoryManager::setMaxEntries(int maxEntries) {
-    maxEntries = std::max(1, maxEntries);
-    this->maxEntries = maxEntries;
-    
-    while (static_cast<int>(history.size()) > maxEntries) {
-        history.pop_back();
+void HistoryManager::setMaxEntries(int max) {
+    if (max > 10) {
+        maxEntries = max;
     }
 }
 

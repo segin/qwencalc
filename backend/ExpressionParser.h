@@ -10,15 +10,22 @@ namespace qwencalc {
 
 class ExpressionError : public std::runtime_error {
 public:
-    explicit ExpressionError(const std::string& message);
+    explicit ExpressionError(const std::string& message) : std::runtime_error(message) {}
 };
 
 class ExpressionParser {
 public:
     ExpressionParser();
     
-    double parse(const std::string& expression) const;
+    double parse(const std::string& expression);
     
+    // Convenience method
+    double calculateSimple(const std::string& expr);
+    
+    // Tokenization
+    void tokenize(const std::string& expression, std::vector<char>& tokens, std::vector<std::string>& values) const;
+    
+    // Helper methods
     double parseExpression(int& pos) const;
     double parseTerm(int& pos) const;
     double parseFactor(int& pos) const;
@@ -27,8 +34,10 @@ public:
     double applyUnaryOperator(char op, double value) const;
     double applyBinaryOperator(char op, double left, double right) const;
     
-    double factorial(int n);
-    double factorial(double n);
+    double factorial(int n) const;
+    double factorial(double n) const;
+    
+    double factorialHelper(double n) const;
     
     bool isOperatorChar(char c) const;
     bool isUnaryOperator(char c) const;
@@ -39,10 +48,6 @@ public:
     bool hasFunction(const std::string& expression, const std::string& funcName) const;
     bool isParenthesis(char c) const;
     bool isWhitespace(char c) const;
-    
-    double factorialHelper(double n);
-    
-    void tokenize(const std::string& expression, std::vector<char>& tokens, std::vector<std::string>& values);
     
 private:
     std::string currentExpression;

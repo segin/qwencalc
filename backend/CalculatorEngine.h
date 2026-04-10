@@ -31,7 +31,7 @@ public:
     void setPrecision(int precision);
     int getPrecision() const;
     
-    bool isValidExpression(const std::string& expression) const;
+    bool isValidExpression(const std::string& expression);
     
 private:
     ExpressionParser parser;

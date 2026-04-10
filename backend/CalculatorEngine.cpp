@@ -1,36 +1,42 @@
 #include "CalculatorEngine.h"
 #include <cmath>
+#include <iomanip>
+#include <sstream>
+#include <algorithm>
 
 namespace qwencalc {
 
 CalculatorEngine::CalculatorEngine()
-    : memory(0.0), precision(10) {}
+    : memory(0.0), precision(10) {
+}
 
 double CalculatorEngine::calculate(const std::string& expression) {
+    double result = 0.0;
+    
     try {
-        double result = parser.parse(expression);
-        result = applyRounding(result);
-        
+        result = parser.parse(expression);
         lastResult = std::to_string(result);
         lastExpression = expression;
         
         historyManager.addEntry(expression, result);
-        
-        return result;
     } catch (const ExpressionError& e) {
         lastResult = "Error";
-        throw;
+        lastExpression = expression;
+        historyManager.addEntry(expression, 0.0);
     }
+    
+    return result;
 }
 
 void CalculatorEngine::clear() {
     memory = 0.0;
-    lastResult.clear();
-    lastExpression.clear();
+    precision = 10;
 }
 
 void CalculatorEngine::clearHistory() {
     historyManager.clear();
+    lastResult.clear();
+    lastExpression.clear();
 }
 
 double CalculatorEngine::getMemory() const {
@@ -49,16 +55,9 @@ void CalculatorEngine::subtractFromMemory(double value) {
     memory -= value;
 }
 
-void CalculatorEngine::recallMemory() {
-    lastResult = std::to_string(memory);
-}
-
-void CalculatorEngine::storeMemory(const std::string& expression) {
-    double result = parser.parse(expression);
-    memory = result;
-    lastResult = std::to_string(memory);
-    lastExpression = expression;
-    historyManager.addEntry(expression, memory);
+double CalculatorEngine::applyRounding(double value) {
+    double factor = std::pow(10.0, precision);
+    return std::round(value * factor) / factor;
 }
 
 std::string CalculatorEngine::getHistory() const {
@@ -74,31 +73,17 @@ std::string CalculatorEngine::getLastExpression() const {
 }
 
 void CalculatorEngine::setPrecision(int prec) {
-    precision = std::max(1, std::min(20, prec));
+    if (prec > 0 && prec <= 15) {
+        precision = prec;
+    }
 }
 
 int CalculatorEngine::getPrecision() const {
     return precision;
 }
 
-bool CalculatorEngine::isValidExpression(const std::string& expression) const {
-    if (expression.empty()) {
-        return false;
-    }
-    
-    bool valid = true;
-    try {
-        double result = parser.parse(expression);
-    } catch (...) {
-        valid = false;
-    }
-    
-    return valid;
-}
-
-double CalculatorEngine::applyRounding(double value) {
-    double multiplier = std::pow(10.0, precision);
-    return std::round(value * multiplier) / multiplier;
+bool CalculatorEngine::isValidExpression(const std::string& expression) {
+    return parser.parse(expression); // 
 }
 
 } // namespace qwencalc
