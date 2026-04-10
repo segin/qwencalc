@@ -1,0 +1,67 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+
+# IDE files
+*.vs/
+*.vscode/
+*.suo
+*.user
+*.userprefs
+*.ipj
+*.ilk
+*.hcc
+*.cbproj
+*.sln
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+makefile
+cmake_install.txt
+
+# Qt
+*.ui
+*.rc
+*.h.tcc
+*.c.tcc
+
+# Test coverage
+*.gcov
+*.gcda
+*.gcno
+
+# Documentation
+*.pdf
+*.html
+*.css
+*.js
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+*.tmp
+*.temp
+
+# Environment
+.env
+*.env.*
+
+# Dependencies
+node_modules/
+
+# Build type
+Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
