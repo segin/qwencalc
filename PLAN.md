@@ -83,15 +83,15 @@ qwencalc/
 ## Milestones (Overall)
 
 ### Phase 1: Backend Foundation (Complete)
-- [ ] ExpressionParser implemented and tested
-- [ ] CalculatorEngine implemented and tested
-- [ ] HistoryManager implemented and tested
+- [x] ExpressionParser implemented and tested
+- [x] CalculatorEngine implemented and tested
+- [x] HistoryManager implemented and tested
 
 ### Phase 2: Frontend Implementation (Complete)
-- [ ] DisplayWidget implemented
-- [ ] KeypadWidget implemented
-- [ ] CalculatorWindow implemented
-- [ ] ThemeManager implemented
+- [x] DisplayWidget implemented
+- [x] KeypadWidget implemented
+- [x] CalculatorWindow implemented
+- [x] ThemeManager implemented
 
 ### Phase 3: Integration (Pending)
 - [ ] Main application entry point
