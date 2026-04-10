@@ -41,12 +41,7 @@ set(HEADERS
 # Executable target
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-# Qt UI files
-set(UIS
-    frontend/calculator_window.ui
-)
-
-qt_add_ui(${PROJECT_NAME} ${UIS})
+# No .ui files used - all UI is built programmatically
 
 # Link Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
