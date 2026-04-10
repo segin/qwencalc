@@ -31,12 +31,18 @@ void CalculatorWindow::setupUI() {
     
     QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
     
+    display = new DisplayWidget(centralWidget);
+    expressionLine = new QLineEdit(centralWidget);
+    expressionLine->setPlaceholderText("Enter expression...");
+    
     QGroupBox* displayGroup = new QGroupBox("Display");
     QVBoxLayout* displayLayout = new QVBoxLayout();
     displayLayout->addWidget(display);
     displayLayout->addWidget(expressionLine);
     displayGroup->setLayout(displayLayout);
     mainLayout->addWidget(displayGroup);
+    
+    keypad = new KeypadWidget(centralWidget);
     
     QHBoxLayout* keypadLayout = new QHBoxLayout();
     
