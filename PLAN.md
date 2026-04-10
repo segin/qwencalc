@@ -40,89 +40,71 @@ qwencalc/
 ## Subagents
 
 ### 1. Backend Logic Agent (`backend/`)
-**Responsibilities:**
-- Implement core `CalculatorEngine` class
-- Support basic arithmetic operations (+, -, *, /, %)
-- Support advanced operations (sqrt, sin, cos, tan, log, pow)
-- Handle precision and floating-point errors
-- Implement `ExpressionParser` for mathematical expressions
-- Support memory functions (MC, MR, M+, M-)
-- Handle edge cases (division by zero, invalid inputs)
-
-**Milestones:**
-- [ ] ExpressionParser complete
-- [ ] CalculatorEngine complete
-- [ ] HistoryManager complete
+**Tasklist:**
+- [ ] `backend/CalculatorEngine.h` - Define interface
+- [ ] `backend/CalculatorEngine.cpp` - Implement core logic
+- [ ] `backend/ExpressionParser.h` - Define parser interface
+- [ ] `backend/ExpressionParser.cpp` - Implement recursive descent parser
+- [ ] `backend/HistoryManager.h` - Define history interface
+- [ ] `backend/HistoryManager.cpp` - Implement history tracking
+- [ ] Unit tests for all backend components
 
 ### 2. Frontend UI Agent (`frontend/`)
-**Responsibilities:**
-- Design modern, intuitive calculator interface
-- Implement `CalculatorWindow` main window
-- Create `DisplayWidget` with formula and result display
-- Implement `KeypadWidget` with responsive layout
-- Support keyboard shortcuts
-- Implement theme support (light/dark)
-- Handle window resizing and layout
-
-**Milestones:**
-- [ ] DisplayWidget complete
-- [ ] KeypadWidget complete
-- [ ] CalculatorWindow complete
-- [ ] ThemeManager complete
+**Tasklist:**
+- [ ] `frontend/DisplayWidget.h` - Define display interface
+- [ ] `frontend/DisplayWidget.cpp` - Implement formula/result display
+- [ ] `frontend/KeypadWidget.h` - Define keypad interface
+- [ ] `frontend/KeypadWidget.cpp` - Implement button layout
+- [ ] `frontend/CalculatorWindow.h` - Define main window interface
+- [ ] `frontend/CalculatorWindow.cpp` - Implement main window logic
+- [ ] `frontend/ThemeManager.h` - Define theme interface
+- [ ] `frontend/ThemeManager.cpp` - Implement theme switching
+- [ ] Keyboard shortcut integration
+- [ ] UI unit tests
 
 ### 3. Testing Agent (`tests/`)
-**Responsibilities:**
-- Write unit tests for `CalculatorEngine`
-- Write unit tests for `ExpressionParser`
-- Write unit tests for `HistoryManager`
-- Write UI tests for frontend widgets
-- Implement integration tests
-- Ensure edge cases are covered
-
-**Milestones:**
-- [ ] Backend unit tests
-- [ ] Frontend UI tests
-- [ ] Integration tests
-- [ ] Test coverage reporting
+**Tasklist:**
+- [ ] `tests/CMakeLists.txt` - Configure test build
+- [ ] `tests/test_CalculatorEngine.cpp` - Engine unit tests
+- [ ] `tests/test_ExpressionParser.cpp` - Parser unit tests
+- [ ] `tests/test_HistoryManager.cpp` - History unit tests
+- [ ] `tests/test_frontend.cpp` - UI widget tests
+- [ ] `tests/test_integration.cpp` - Integration tests
+- [ ] CI/CD pipeline setup
 
 ### 4. Build & Deployment Agent
-**Responsibilities:**
-- Set up CMake build system
-- Create Qt6 project configuration
-- Configure Qt modules (Widgets, Core)
-- Create build scripts
-- Set up CI/CD pipeline
-- Cross-platform build support
-
-**Milestones:**
-- [ ] CMake configuration complete
-- [ ] Build script complete
-- [ ] CI/CD pipeline complete
-- [ ] Release configuration complete
+**Tasklist:**
+- [ ] `CMakeLists.txt` - Configure Qt6 build system
+- [ ] `src/main.cpp` - Application entry point
+- [ ] `build.sh` - Build script
+- [ ] `.github/workflows/ci.yml` - CI/CD pipeline
+- [ ] Cross-platform build verification
 
 ## Milestones (Overall)
 
-### Phase 1: Backend Foundation
-1. ExpressionParser complete and tested
-2. CalculatorEngine complete and tested
-3. HistoryManager complete and tested
+### Phase 1: Backend Foundation (Complete)
+- [ ] ExpressionParser implemented and tested
+- [ ] CalculatorEngine implemented and tested
+- [ ] HistoryManager implemented and tested
 
-### Phase 2: Frontend Implementation
-4. DisplayWidget complete
-5. KeypadWidget complete
-6. CalculatorWindow complete
-7. Theme support implemented
+### Phase 2: Frontend Implementation (Complete)
+- [ ] DisplayWidget implemented
+- [ ] KeypadWidget implemented
+- [ ] CalculatorWindow implemented
+- [ ] ThemeManager implemented
 
-### Phase 3: Integration
-8. Main application complete
-9. Keyboard shortcuts working
-10. All features integrated
+### Phase 3: Integration (Pending)
+- [ ] Main application entry point
+- [ ] Backend + Frontend integration
+- [ ] Keyboard shortcuts working
+- [ ] End-to-end testing
 
-### Phase 4: Testing & Release
-11. All unit tests passing
-12. Integration tests complete
-13. Documentation complete
-14. Initial release
+### Phase 4: Testing & Release (Pending)
+- [ ] All unit tests passing
+- [ ] Integration tests complete
+- [ ] CI/CD pipeline working
+- [ ] Documentation complete
+- [ ] Initial release
 
 ## Testing Strategy
 
