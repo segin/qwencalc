@@ -1,5 +1,4 @@
-#ifndef CALCULATOR_ENGINE_H
-#define CALCULATOR_ENGINE_H
+#pragma once
 
 #include "ExpressionParser.h"
 #include "HistoryManager.h"
@@ -45,5 +44,3 @@ private:
 };
 
 } // namespace qwencalc
-
-#endif // CALCULATOR_ENGINE_H

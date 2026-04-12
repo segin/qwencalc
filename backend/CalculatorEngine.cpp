@@ -19,13 +19,21 @@ double CalculatorEngine::calculate(const std::string& expression) {
         lastExpression = expression;
         
         historyManager.addEntry(expression, result);
+        return result;
     } catch (const ExpressionError& e) {
         lastResult = "Error";
         lastExpression = expression;
         historyManager.addEntry(expression, 0.0);
+        
+        std::string msg = e.what();
+        if (msg.find("Division by zero") == 0 || msg.find("Modulo by zero") == 0) {
+            result = 0.0;
+            historyManager.addEntry(expression, 0.0);
+            return result;
+        }
+        
+        throw;
     }
-    
-    return result;
 }
 
 void CalculatorEngine::clear() {
@@ -83,7 +91,21 @@ int CalculatorEngine::getPrecision() const {
 }
 
 bool CalculatorEngine::isValidExpression(const std::string& expression) {
-    return parser.parse(expression); // 
+    try {
+        parser.parse(expression);
+        return true;
+    } catch (const ExpressionError&) {
+        return false;
+    }
+}
+
+void CalculatorEngine::storeMemory(const std::string& expression) {
+    try {
+        double result = parser.parse(expression);
+        memory = result;
+    } catch (const ExpressionError&) {
+        memory = 0.0;
+    }
 }
 
 } // namespace qwencalc

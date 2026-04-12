@@ -1,22 +1,21 @@
-cmake_minimum_required(VERSION 3.16)
-project(qwencalc VERSION 0.1.0 LANGUAGES C++)
+cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
-# Qt6 configuration
-find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
+project(qwencalc LANGUAGES CXX)
 
-qt_standard_project_setup()
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-# Include directories
-include_directories(
-    ${CMAKE_SOURCE_DIR}/backend
-    ${CMAKE_SOURCE_DIR}/frontend
+qt6_add_resources(qwencalc_resources
+    SOURCES
+    qwencalc.qrc
 )
 
-# Source files
-set(SOURCES
+add_executable(qwencalc
     src/main.cpp
     backend/CalculatorEngine.cpp
     backend/ExpressionParser.cpp
@@ -27,37 +26,26 @@ set(SOURCES
     frontend/ThemeManager.cpp
 )
 
-# Header files
-set(HEADERS
-    backend/CalculatorEngine.h
-    backend/ExpressionParser.h
-    backend/HistoryManager.h
-    frontend/CalculatorWindow.h
-    frontend/DisplayWidget.h
-    frontend/KeypadWidget.h
-    frontend/ThemeManager.h
+target_include_directories(qwencalc PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/backend
+    ${CMAKE_SOURCE_DIR}/frontend
+    ${CMAKE_SOURCE_DIR}/src
 )
 
-# Executable target
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-
-# No .ui files used - all UI is built programmatically
-
-# Link Qt libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(qwencalc PRIVATE
     Qt6::Core
     Qt6::Widgets
 )
 
-# Install target
-install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
+target_compile_options(qwencalc PRIVATE
+    -Wall
+    -Wextra
+    -Werror
+)
 
-# Build type configuration
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
-endif()
+install(TARGETS qwencalc BUNDLE DESTINATION .)
 
-# Test configuration
 if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)

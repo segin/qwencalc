@@ -1,52 +1,11 @@
-#ifndef THEME_MANAGER_H
-#define THEME_MANAGER_H
+#pragma once
 
 #include <QColor>
 #include <QPalette>
 #include <QSettings>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFileInfo>
-#include <QFile>
 #include <QString>
 #include <QMap>
 #include <QList>
-#include <QVariant>
-#include <QByteArray>
-#include <QPoint>
-#include <QRect>
-#include <QSize>
-#include <QEvent>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QFocusEvent>
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <QShowEvent>
-#include <QHideEvent>
-#include <QTimerEvent>
-#include <QChildEvent>
-#include <QMetaEvent>
-#include <QStaticMetaType>
-#include <QStyle>
-#include <QStyleOption>
-#include <QPainter>
-#include <QPainterPath>
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsLineItem>
-#include <QGraphicsPolygonItem>
-#include <QGraphicsPathItem>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsTextItem>
-#include <QGraphicsSvgItem>
-#include <QGraphicsFrameItem>
-#include <QGraphicsLayoutItem>
-#include <QGraphicsWidget>
-#include <QGraphicsProxyWidget>
 
 namespace qwencalc {
 

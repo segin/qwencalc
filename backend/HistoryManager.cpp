@@ -1,4 +1,6 @@
 #include "HistoryManager.h"
+#include <sstream>
+#include <iomanip>
 
 namespace qwencalc {
 
@@ -7,7 +9,12 @@ HistoryManager::HistoryManager()
 }
 
 void HistoryManager::addEntry(const std::string& expression, double result) {
-    history.push_back(std::make_pair(expression, result));
+    HistoryEntry entry;
+    entry.expression = expression;
+    entry.result = result;
+    entry.timestamp = std::time(nullptr);
+    
+    history.push_back(entry);
     
     while (static_cast<int>(history.size()) > maxEntries) {
         history.pop_front();
@@ -23,17 +30,19 @@ int HistoryManager::size() const {
 }
 
 std::string HistoryManager::getHistory() const {
-    std::string result;
+    std::ostringstream ss;
     for (const auto& entry : history) {
-        result += entry.first + " = " + std::to_string(entry.second) + "\n";
+        ss << entry.expression << " = " << std::setprecision(10) << entry.result << "\n";
     }
-    return result;
+    return ss.str();
 }
 
 std::vector<std::string> HistoryManager::getHistoryList() const {
     std::vector<std::string> list;
     for (const auto& entry : history) {
-        list.push_back(entry.first + " = " + std::to_string(entry.second));
+        std::ostringstream ss;
+        ss << entry.expression << " = " << std::setprecision(10) << entry.result;
+        list.push_back(ss.str());
     }
     return list;
 }
@@ -42,24 +51,72 @@ double HistoryManager::getLastResult() const {
     if (history.empty()) {
         return 0.0;
     }
-    return history.back().second;
+    return history.back().result;
 }
 
 std::string HistoryManager::getLastEntry() const {
     if (history.empty()) {
         return "";
     }
-    return history.back().first + " = " + std::to_string(history.back().second);
+    std::ostringstream ss;
+    ss << history.back().expression << " = " << std::setprecision(10) << history.back().result;
+    return ss.str();
 }
 
 void HistoryManager::setMaxEntries(int max) {
-    if (max > 10) {
+    if (max >= 1) {
         maxEntries = max;
+        trimHistory();
     }
 }
 
 int HistoryManager::getMaxEntries() const {
     return maxEntries;
+}
+
+void HistoryManager::trimHistory() {
+    while (static_cast<int>(history.size()) > maxEntries) {
+        history.pop_front();
+    }
+}
+
+bool HistoryManager::saveToFile(const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    for (const auto& entry : history) {
+        file << entry.expression << " " << entry.result << " " << entry.timestamp << "\n";
+    }
+    
+    file.close();
+    return true;
+}
+
+bool HistoryManager::loadFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        history.clear();
+        return true;
+    }
+    
+    history.clear();
+    
+    std::string expression;
+    double result;
+    time_t timestamp;
+    
+    while (file >> expression >> result >> timestamp) {
+        HistoryEntry entry;
+        entry.expression = expression;
+        entry.result = result;
+        entry.timestamp = timestamp;
+        history.push_back(entry);
+    }
+    
+    file.close();
+    return true;
 }
 
 } // namespace qwencalc

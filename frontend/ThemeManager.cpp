@@ -1,4 +1,5 @@
 #include "ThemeManager.h"
+#include <QtWidgets>
 
 namespace qwencalc {
 
@@ -19,6 +20,31 @@ void ThemeManager::initializeDefaultThemes() {
 
 void ThemeManager::loadTheme(const QString& themeName) {
     currentTheme = themeName;
+    if (themeName == "light") {
+        colors["background"] = QColor("#f0f0f0");
+        colors["text"] = QColor("#333333");
+        colors["button"] = QColor("#cccccc");
+        colors["buttonHover"] = QColor("#bbbbbb");
+        colors["buttonPressed"] = QColor("#aaaaaa");
+        colors["displayBackground"] = QColor("#ffffff");
+        colors["displayText"] = QColor("#000000");
+    } else if (themeName == "dark") {
+        colors["background"] = QColor("#1e1e1e");
+        colors["text"] = QColor("#ffffff");
+        colors["button"] = QColor("#4a4a4a");
+        colors["buttonHover"] = QColor("#5a5a5a");
+        colors["buttonPressed"] = QColor("#3a3a3a");
+        colors["displayBackground"] = QColor("#000000");
+        colors["displayText"] = QColor("#ffffff");
+    } else if (themeName == "blue") {
+        colors["background"] = QColor("#1a2a4a");
+        colors["text"] = QColor("#aaddff");
+        colors["button"] = QColor("#2a4a6a");
+        colors["buttonHover"] = QColor("#3a5a7a");
+        colors["buttonPressed"] = QColor("#1a3a5a");
+        colors["displayBackground"] = QColor("#0a1a3a");
+        colors["displayText"] = QColor("#ffffff");
+    }
 }
 
 void ThemeManager::saveTheme(const QString& themeName) {
@@ -26,12 +52,13 @@ void ThemeManager::saveTheme(const QString& themeName) {
 }
 
 void ThemeManager::deleteTheme(const QString& themeName) {
-    colors.clear();
-    initializeDefaultThemes();
+    if (currentTheme == themeName) {
+        initializeDefaultThemes();
+        currentTheme = "dark";
+    }
 }
 
 void ThemeManager::listThemes() {
-    qDebug() << "Available themes:" << currentTheme;
 }
 
 QColor ThemeManager::getBackgroundColor() const {
@@ -91,11 +118,11 @@ void ThemeManager::setDisplayText(const QColor& color) {
 }
 
 void ThemeManager::applyThemeToWidget(QWidget* widget) {
-    if (widget) {
-        QPalette bgPalette = widget->palette();
-        bgPalette.setColor(QPalette::Window(colors["background"]));
-        widget->setPalette(bgPalette);
-    }
+    if (!widget) return;
+    QPalette palette;
+    palette.setColor(QPalette::Window, colors["background"]);
+    palette.setColor(QPalette::Text, colors["text"]);
+    widget->setPalette(palette);
 }
 
 QString ThemeManager::getCurrentTheme() const {

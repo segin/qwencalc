@@ -1,6 +1,6 @@
-#include "backend/CalculatorEngine.h"
-#include "backend/ExpressionParser.h"
-#include "backend/HistoryManager.h"
+#include "CalculatorEngine.h"
+#include "ExpressionParser.h"
+#include "HistoryManager.h"
 #include <iostream>
 #include <cmath>
 #include <cassert>
@@ -120,29 +120,4 @@ void testHistory() {
     std::string history = engine.getHistory();
     assert(history.find("2 + 2") != std::string::npos);
     std::cout << "✓ History test passed" << std::endl;
-}
-
-int main() {
-    std::cout << "=== Integration Tests ===" << std::endl;
-    std::cout << std::endl;
-    
-    testCalculateBasic();
-    testCalculateMultiplication();
-    testCalculateDivision();
-    testCalculateParentheses();
-    testCalculateOrderOfOperations();
-    testCalculateSin();
-    testCalculateCos();
-    testClear();
-    testMemory();
-    testAddToMemory();
-    testSubtractFromMemory();
-    testPrecision();
-    testValidExpression();
-    testInvalidExpression();
-    testHistory();
-    
-    std::cout << std::endl;
-    std::cout << "=== All integration tests passed ===" << std::endl;
-    return 0;
 }

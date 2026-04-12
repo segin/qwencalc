@@ -1,10 +1,5 @@
 #include "KeypadWidget.h"
-#include <QGridLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QFont>
-#include <QPalette>
-#include <QColor>
+#include <QtWidgets>
 
 namespace qwencalc {
 
@@ -24,9 +19,11 @@ void KeypadWidget::createButtons() {
     buttons["tan"] = addButton("tan", "function", QColor("#4a4a4a"));
     buttons["log"] = addButton("log", "function", QColor("#4a4a4a"));
     buttons["ln"] = addButton("ln", "function", QColor("#4a4a4a"));
-    buttons["sqrt"] = addButton("sqrt", "function", QColor("#4a4a4a"));
+    buttons["sqrt"] = addButton("√", "function", QColor("#4a4a4a"));
     buttons["pow"] = addButton("x^y", "function", QColor("#4a4a4a"));
     buttons["factorial"] = addButton("x!", "function", QColor("#4a4a4a"));
+    buttons["openParen"] = addButton("(", "paren", QColor("#4caf50"));
+    buttons["closeParen"] = addButton(")", "paren", QColor("#4caf50"));
     
     buttons["7"] = addButton("7", "number", QColor("#5a5a5a"));
     buttons["8"] = addButton("8", "number", QColor("#5a5a5a"));
@@ -41,95 +38,75 @@ void KeypadWidget::createButtons() {
     
     buttons["clear"] = addButton("C", "operator", QColor("#8b0000"));
     buttons["backspace"] = addButton("⌫", "operator", QColor("#8b0000"));
-    buttons["divide"] = addButton("/", "operator", QColor("#ff6b6b"));
-    buttons["multiply"] = addButton("*", "operator", QColor("#ff6b6b"));
+    buttons["divide"] = addButton("÷", "operator", QColor("#ff6b6b"));
+    buttons["multiply"] = addButton("×", "operator", QColor("#ff6b6b"));
     buttons["subtract"] = addButton("-", "operator", QColor("#ff6b6b"));
     buttons["add"] = addButton("+", "operator", QColor("#ff6b6b"));
     buttons["equals"] = addButton("=", "operator", QColor("#4caf50"));
     buttons["dot"] = addButton(".", "number", QColor("#5a5a5a"));
-    buttons["memory"] = addButton("MEM", "operator", QColor("#4a4a4a"));
+    buttons["MC"] = addButton("MC", "memory", QColor("#ff9800"));
+    buttons["MR"] = addButton("MR", "memory", QColor("#ff9800"));
+    buttons["MS"] = addButton("MS", "memory", QColor("#ff9800"));
+    buttons["M+"] = addButton("M+", "memory", QColor("#ff9800"));
+    buttons["M-"] = addButton("M-", "memory", QColor("#ff9800"));
     buttons["history"] = addButton("HIST", "operator", QColor("#4a4a4a"));
     
+    // Row 1: Scientific functions (5 buttons)
     layout->addWidget(buttons["sin"], row, col++, 1, 1);
     layout->addWidget(buttons["cos"], row, col++, 1, 1);
     layout->addWidget(buttons["tan"], row, col++, 1, 1);
     layout->addWidget(buttons["log"], row, col++, 1, 1);
+    layout->addWidget(buttons["ln"], row, col++, 1, 1);
     
+    // Row 2: Scientific functions + parentheses (5 buttons)
     row++; col = 0;
-    buttons["7"]->setText("7");
-    buttons["8"]->setText("8");
-    buttons["9"]->setText("9");
-    buttons["4"]->setText("4");
-    buttons["5"]->setText("5");
-    buttons["6"]->setText("6");
-    buttons["1"]->setText("1");
-    buttons["2"]->setText("2");
-    buttons["3"]->setText("3");
-    buttons["0"]->setText("0");
+    layout->addWidget(buttons["sqrt"], row, col++, 1, 1);
+    layout->addWidget(buttons["pow"], row, col++, 1, 1);
+    layout->addWidget(buttons["factorial"], row, col++, 1, 1);
+    layout->addWidget(buttons["openParen"], row, col++, 1, 1);
+    layout->addWidget(buttons["closeParen"], row, col++, 1, 1);
     
-    buttons["7"]->setMaximumHeight(40);
-    buttons["8"]->setMaximumHeight(40);
-    buttons["9"]->setMaximumHeight(40);
-    buttons["4"]->setMaximumHeight(40);
-    buttons["5"]->setMaximumHeight(40);
-    buttons["6"]->setMaximumHeight(40);
-    buttons["1"]->setMaximumHeight(40);
-    buttons["2"]->setMaximumHeight(40);
-    buttons["3"]->setMaximumHeight(40);
-    buttons["0"]->setMaximumHeight(40);
-    
-    layout->addWidget(buttons["7"], row, col++, 2, 1);
-    layout->addWidget(buttons["8"], row, col++, 2, 1);
-    layout->addWidget(buttons["9"], row, col++, 2, 1);
-    
-    row++; col = 3;
-    layout->addWidget(buttons["sqrt"], row, col++, 2, 1);
-    layout->addWidget(buttons["pow"], row, col++, 2, 1);
-    
+    // Row 3: Number keys + memory + history (6 buttons)
     row++; col = 0;
-    buttons["clear"]->setText("C");
-    buttons["backspace"]->setText("⌫");
-    buttons["memory"]->setText("MEM");
-    buttons["history"]->setText("HIST");
+    layout->addWidget(buttons["7"], row, col++, 1, 1);
+    layout->addWidget(buttons["8"], row, col++, 1, 1);
+    layout->addWidget(buttons["9"], row, col++, 1, 1);
+    layout->addWidget(buttons["MC"], row, col++, 1, 1);
+    layout->addWidget(buttons["MR"], row, col++, 1, 1);
+    layout->addWidget(buttons["MS"], row, col++, 1, 1);
     
-    buttons["clear"]->setMaximumHeight(40);
-    buttons["backspace"]->setMaximumHeight(40);
-    buttons["memory"]->setMaximumHeight(40);
-    buttons["history"]->setMaximumHeight(40);
+    // Row 4: Number keys + memory (6 buttons)
+    row++; col = 0;
+    layout->addWidget(buttons["4"], row, col++, 1, 1);
+    layout->addWidget(buttons["5"], row, col++, 1, 1);
+    layout->addWidget(buttons["6"], row, col++, 1, 1);
+    layout->addWidget(buttons["M+"], row, col++, 1, 1);
+    layout->addWidget(buttons["M-"], row, col++, 1, 1);
+    layout->addWidget(buttons["history"], row, col++, 1, 1);
     
-    buttons["divide"]->setText("÷");
-    buttons["multiply"]->setText("×");
-    buttons["subtract"]->setText("-");
-    buttons["add"]->setText("+");
-    buttons["equals"]->setText("=");
-    buttons["dot"]->setText(".");
-    
-    buttons["divide"]->setMaximumHeight(40);
-    buttons["multiply"]->setMaximumHeight(40);
-    buttons["subtract"]->setMaximumHeight(40);
-    buttons["add"]->setMaximumHeight(40);
-    buttons["equals"]->setMaximumHeight(40);
-    buttons["dot"]->setMaximumHeight(40);
-    
-    layout->addWidget(buttons["clear"], row, col++, 2, 1);
-    layout->addWidget(buttons["backspace"], row, col++, 2, 1);
-    layout->addWidget(buttons["divide"], row, col++, 2, 1);
-    
-    layout->addWidget(buttons["memory"], row + 1, 4, 1, 1);
-    layout->addWidget(buttons["history"], row + 1, 5, 1, 1);
-    
-    layout->addWidget(buttons["factorial"], row + 2, 0, 1, 1);
-    layout->addWidget(buttons["0"], row + 2, 1, 1, 2);
-    layout->addWidget(buttons["dot"], row + 2, 3, 1, 1);
-    layout->addWidget(buttons["equals"], row + 2, 4, 1, 2);
+    // Row 5: Number keys + operators (6 buttons)
+    row++; col = 0;
+    layout->addWidget(buttons["1"], row, col++, 1, 1);
+    layout->addWidget(buttons["2"], row, col++, 1, 1);
+    layout->addWidget(buttons["3"], row, col++, 1, 1);
+    layout->addWidget(buttons["backspace"], row, col++, 1, 1);
+    layout->addWidget(buttons["divide"], row, col++, 1, 1);
+    layout->addWidget(buttons["add"], row, col++, 1, 1);
+     row++; col = 0;
+    layout->addWidget(buttons["0"], row, col++, 1, 1);
+    layout->addWidget(buttons["dot"], row, col++, 1, 1);
+    layout->addWidget(buttons["equals"], row, col++, 1, 1);
+    layout->addWidget(buttons["clear"], row, col++, 1, 1);
+    layout->addWidget(buttons["subtract"], row, col++, 1, 1);
+    layout->addWidget(buttons["multiply"], row, col++, 1, 1);
 }
 
-QPushButton* KeypadWidget::addButton(const QString& text, const QString& type, const QColor& color) {
+QPushButton* KeypadWidget::addButton(const QString& text, const QString&, const QColor& color) {
     QPushButton* button = new QPushButton(this);
     button->setText(text);
-    button->setMinimumSize(60, 60);
-    button->setMaximumSize(80, 80);
-    button->setStyleSheet("QPushButton { background-color: " + color.name() + "; color: white; font-size: 18px; font-weight: bold; } QPushButton:pressed { background-color: " + color.lighter(90).name() + "; }");
+    button->setMinimumSize(45, 45);
+    button->setMaximumSize(60, 60);
+    button->setStyleSheet("QPushButton { background-color: " + color.name() + "; color: white; font-size: 14px; font-weight: bold; } QPushButton:pressed { background-color: " + color.lighter(90).name() + "; }");
     return button;
 }
 
@@ -148,42 +125,62 @@ void KeypadWidget::onButtonClick() {
     if (!button) return;
     
     QString text = button->text();
-    QString type;
     
-    if (button->objectName().startsWith("btn") && button->objectName().length() > 3) {
-        QString btnText = button->text();
-        if (btnText == "sin" || btnText == "cos" || btnText == "tan" || btnText == "log" || btnText == "ln" || btnText == "sqrt" || btnText == "x^y" || btnText == "x!") {
-            emit functionClicked(btnText);
-            return;
-        }
-        if (btnText == "C") {
-            emit clearClicked();
-            return;
-        }
-        if (btnText == "⌫") {
-            emit backspaceClicked();
-            return;
-        }
-        if (btnText == "=") {
-            emit equalsClicked();
-            return;
-        }
-        if (btnText == "MEM") {
-            emit memoryClicked("add");
-            return;
-        }
-        if (btnText == "HIST") {
-            emit historyToggled();
-            return;
-        }
-        if (text == "+" || text == "-" || text == "×" || text == "÷" || text == "/") {
-            emit operatorClicked(text);
-            return;
-        }
-        if (text == "." || (text.length() == 1 && text.toLatin1() >= '0' && text.toLatin1() <= '9')) {
-            emit numberClicked(text.toInt());
-            return;
-        }
+    if (text == "sin" || text == "cos" || text == "tan" || text == "log" || text == "ln" || text == "sqrt" || text == "x^y" || text == "x!") {
+        emit functionClicked(text);
+        return;
+    }
+    if (text == "(" || text == ")") {
+        emit parenClicked(text);
+        return;
+    }
+    if (text == "C") {
+        emit clearClicked();
+        return;
+    }
+    if (text == "⌫") {
+        emit backspaceClicked();
+        return;
+    }
+    if (text == "=") {
+        emit equalsClicked();
+        return;
+    }
+    if (text == "MC") {
+        emit memoryClicked("clear");
+        return;
+    }
+    if (text == "MR") {
+        emit memoryClicked("recall");
+        return;
+    }
+    if (text == "MS") {
+        emit memoryClicked("store");
+        return;
+    }
+    if (text == "M+") {
+        emit memoryClicked("add");
+        return;
+    }
+    if (text == "M-") {
+        emit memoryClicked("subtract");
+        return;
+    }
+    if (text == "HIST") {
+        emit historyToggled();
+        return;
+    }
+    if (text == "+" || text == "−" || text == "×" || text == "÷" || text == "/") {
+        emit operatorClicked(text);
+        return;
+    }
+    if (text == ".") {
+        emit dotClicked();
+        return;
+    }
+    if (text.length() == 1 && text >= "0" && text <= "9") {
+        emit numberClicked(text.toInt());
+        return;
     }
 }
 
@@ -211,7 +208,7 @@ void KeypadWidget::setButtonsDisabled(bool disabled) {
     }
 }
 
-void KeypadWidget::setTheme(const QString& themeName) {
+void KeypadWidget::setTheme(const QString&) {
     for (auto& button : buttons) {
         button->setStyleSheet("QPushButton { background-color: " + QColor("#4a4a4a").name() + "; color: white; } QPushButton:pressed { background-color: " + QColor("#3a3a3a").name() + "; }");
     }

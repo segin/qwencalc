@@ -13,8 +13,18 @@ FetchContent_MakeAvailable(googletest)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Source files for library
+set(BACKEND_SOURCES
+    ${CMAKE_SOURCE_DIR}/backend/CalculatorEngine.cpp
+    ${CMAKE_SOURCE_DIR}/backend/ExpressionParser.cpp
+    ${CMAKE_SOURCE_DIR}/backend/HistoryManager.cpp
+)
+
+# Library
+add_library(qwencalc_lib STATIC ${BACKEND_SOURCES})
+
 # Source files
-set(SOURCES
+set(TEST_SOURCES
     test_CalculatorEngine.cpp
     test_ExpressionParser.cpp
     test_HistoryManager.cpp
@@ -22,7 +32,7 @@ set(SOURCES
 )
 
 # Test executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${TEST_SOURCES})
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -31,12 +41,18 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
 
+target_include_directories(qwencalc_lib PRIVATE
+    ${CMAKE_SOURCE_DIR}/backend
+    ${CMAKE_SOURCE_DIR}/frontend
+)
+
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Widgets
     gtest
     gtest_main
+    qwencalc_lib
 )
 
 # Enable testing

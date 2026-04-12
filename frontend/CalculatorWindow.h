@@ -1,5 +1,4 @@
-#ifndef CALCULATOR_WINDOW_H
-#define CALCULATOR_WINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QWidget>
@@ -22,12 +21,12 @@ public:
     ~CalculatorWindow() override;
 
     void applyTheme(const QString& themeName);
-    ThemeManager getTheme() const;
+    ThemeManager& getTheme();
 
 private slots:
-    void onNumberClicked();
-    void onOperatorClicked();
-    void onFunctionClicked();
+    void onNumberClicked(int number);
+    void onOperatorClicked(const QString& op);
+    void onFunctionClicked(const QString& func);
     void onClearClicked();
     void onBackspaceClicked();
     void onEqualsClicked();
@@ -35,6 +34,8 @@ private slots:
     void onMemorySubtract();
     void onMemoryRecall();
     void onMemoryStore();
+    void onMemoryClear();
+    void onParenClicked(const QString& paren);
     void onHistoryToggled();
     void onThemeChanged();
 
@@ -42,13 +43,14 @@ private:
     DisplayWidget* display;
     KeypadWidget* keypad;
     QScrollArea* historyArea;
-    QPushButton* memoryLabel;
     QLineEdit* expressionLine;
 
     CalculatorEngine engine;
     ThemeManager themeManager;
     bool historyVisible;
     QString currentExpression;
+    QString currentMemoryDisplay;
+    QLabel* memoryLabelWidget;
 
     void setupUI();
     void setupConnections();

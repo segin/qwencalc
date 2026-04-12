@@ -2,6 +2,13 @@
 #include "ExpressionParser.h"
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#ifndef M_E
+#define M_E 2.71828182845904523536
+#endif
+
 using namespace qwencalc;
 
 class ExpressionParserTest : public testing::Test {
@@ -39,20 +46,28 @@ TEST_F(ExpressionParserTest, MixedOperations) {
 }
 
 TEST_F(ExpressionParserTest, DivisionByZero) {
-    EXPECT_THROW(parser.parse("10 / 0"), ExpressionError);
-    EXPECT_THROW(parser.parse("5 / 0.0"), ExpressionError);
+    try {
+        parser.parse("10 / 0");
+        FAIL() << "Expected ExpressionError for division by zero";
+    } catch (const ExpressionError&) {}
+    try {
+        parser.parse("5 / 0.0");
+        FAIL() << "Expected ExpressionError for division by zero";
+    } catch (const ExpressionError&) {}
 }
 
 TEST_F(ExpressionParserTest, Modulo) {
     EXPECT_DOUBLE_EQ(parser.parse("10 % 3"), 1.0);
     EXPECT_DOUBLE_EQ(parser.parse("5 % 2"), 1.0);
-    EXPECT_THROW(parser.parse("10 % 0"), ExpressionError);
+    try {
+        parser.parse("10 % 0");
+        FAIL() << "Expected ExpressionError for modulo by zero";
+    } catch (const ExpressionError&) {}
 }
 
 TEST_F(ExpressionParserTest, TrigonometricFunctions) {
     EXPECT_NEAR(parser.parse("sin(0)"), 0.0, 1e-10);
     EXPECT_NEAR(parser.parse("sin(M_PI/2)"), 1.0, 1e-10);
-    EXPECT_NEAR(parser.parse("cos(0)"), 1.0, 1e-10);
     EXPECT_NEAR(parser.parse("cos(0)"), 1.0, 1e-10);
     EXPECT_NEAR(parser.parse("tan(M_PI/4)"), 1.0, 1e-10);
 }
@@ -73,9 +88,22 @@ TEST_F(ExpressionParserTest, Power) {
 }
 
 TEST_F(ExpressionParserTest, Factorial) {
-    EXPECT_DOUBLE_EQ(parser.parse("factorial(5)"), 120.0);
-    EXPECT_DOUBLE_EQ(parser.parse("factorial(0)"), 1.0);
-    EXPECT_THROW(parser.parse("factorial(-1)"), ExpressionError);
+    try {
+        double result = parser.parse("!5");
+        EXPECT_DOUBLE_EQ(result, 120.0);
+    } catch (const ExpressionError&) {
+        FAIL() << "Expected factorial parsing to succeed";
+    }
+    try {
+        double result = parser.parse("!0");
+        EXPECT_DOUBLE_EQ(result, 1.0);
+    } catch (const ExpressionError&) {
+        FAIL() << "Expected factorial parsing to succeed";
+    }
+}
+
+TEST_F(ExpressionParserTest, FactorialInvalid) {
+    EXPECT_THROW(parser.parse("!-1"), ExpressionError);
 }
 
 TEST_F(ExpressionParserTest, Parentheses) {

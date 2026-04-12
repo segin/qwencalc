@@ -1,11 +1,18 @@
-#ifndef HISTORY_MANAGER_H
-#define HISTORY_MANAGER_H
+#pragma once
 
 #include <string>
 #include <vector>
 #include <deque>
+#include <ctime>
+#include <fstream>
 
 namespace qwencalc {
+
+struct HistoryEntry {
+    std::string expression;
+    double result;
+    time_t timestamp;
+};
 
 class HistoryManager {
 public:
@@ -26,11 +33,14 @@ public:
     void setMaxEntries(int maxEntries);
     int getMaxEntries() const;
     
+    bool saveToFile(const std::string& filename);
+    bool loadFromFile(const std::string& filename);
+    
 private:
-    std::deque<std::pair<std::string, double>> history;
+    std::deque<HistoryEntry> history;
     int maxEntries;
+    
+    void trimHistory();
 };
 
 } // namespace qwencalc
-
-#endif // HISTORY_MANAGER_H

@@ -9,8 +9,6 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QKeyEvent>
-#include <QShortcut>
-#include <QMessageBox>
 #include <QFrame>
 #include <QTextEdit>
 #include <QLineEdit>
@@ -34,11 +32,15 @@ void CalculatorWindow::setupUI() {
     display = new DisplayWidget(centralWidget);
     expressionLine = new QLineEdit(centralWidget);
     expressionLine->setPlaceholderText("Enter expression...");
+    currentMemoryDisplay = "M = 0.00";
+    memoryLabelWidget = new QLabel(currentMemoryDisplay, centralWidget);
+    memoryLabelWidget->setStyleSheet("QLabel { color: #ff9800; font-weight: bold; font-size: 14px; }");
     
     QGroupBox* displayGroup = new QGroupBox("Display");
     QVBoxLayout* displayLayout = new QVBoxLayout();
     displayLayout->addWidget(display);
     displayLayout->addWidget(expressionLine);
+    displayLayout->addWidget(memoryLabelWidget);
     displayGroup->setLayout(displayLayout);
     mainLayout->addWidget(displayGroup);
     
@@ -56,9 +58,11 @@ void CalculatorWindow::setupUI() {
     QFrame* historyFrame = new QFrame();
     QVBoxLayout* historyLayout = new QVBoxLayout(historyFrame);
     QLabel* historyLabel = new QLabel("History");
+    historyLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 14px; }");
     historyLayout->addWidget(historyLabel);
     
     QTextEdit* historyTextEdit = new QTextEdit();
+    historyTextEdit->setStyleSheet("QTextEdit { background-color: #2d2d2d; color: #d4d4d4; }");
     historyTextEdit->setReadOnly(true);
     historyTextEdit->setMaximumHeight(400);
     historyTextEdit->setAcceptRichText(false);
@@ -87,34 +91,13 @@ void CalculatorWindow::setupConnections() {
         else if (action == "subtract") onMemorySubtract();
         else if (action == "recall") onMemoryRecall();
         else if (action == "store") onMemoryStore();
+        else if (action == "clear") onMemoryClear();
     });
+    connect(keypad, &KeypadWidget::parenClicked, this, &CalculatorWindow::onParenClicked);
     connect(keypad, &KeypadWidget::historyToggled, this, &CalculatorWindow::onHistoryToggled);
-    
-    QShortcut* shortcutClear = new QShortcut(QKeySequence(Qt::Key_Escape), this);
-    connect(shortcutClear, &QShortcut::activated, this, [this]() {
-        onClearClicked();
-    });
-    
-    QShortcut* shortcutBackspace = new QShortcut(QKeySequence(Qt::Key_Back), this);
-    connect(shortcutBackspace, &QShortcut::activated, this, [this]() {
-        onBackspaceClicked();
-    });
-    
-    QShortcut* shortcutEquals = new QShortcut(QKeySequence(Qt::Key_Return), this);
-    connect(shortcutEquals, &QShortcut::activated, this, [this]() {
-        if (!currentExpression.isEmpty()) onEqualsClicked();
-    });
-    
-    QShortcut* shortcutHistory = new QShortcut(QKeySequence(Qt::Key_H), this);
-    connect(shortcutHistory, &QShortcut::activated, this, [this]() {
-        onHistoryToggled();
-    });
-    
-    QShortcut* shortcutToggleTheme = new QShortcut(QKeySequence(Qt::Key_T), this);
-    connect(shortcutToggleTheme, &QShortcut::activated, this, [this]() {
-        static bool dark = false;
-        dark = !dark;
-        onThemeChanged();
+    connect(keypad, &KeypadWidget::dotClicked, this, [this]() {
+        currentExpression += ".";
+        updateDisplay();
     });
 }
 
@@ -148,26 +131,57 @@ void CalculatorWindow::applyTheme(const QString& themeName) {
     }
 }
 
-ThemeManager CalculatorWindow::getTheme() const {
+ThemeManager& CalculatorWindow::getTheme() {
     return themeManager;
 }
 
-void CalculatorWindow::onNumberClicked() {
-    emit keypad->numberClicked();
+void CalculatorWindow::onNumberClicked(int number) {
+    currentExpression += QString::number(number);
+    updateDisplay();
 }
 
-void CalculatorWindow::onOperatorClicked() {
-    emit keypad->operatorClicked();
+void CalculatorWindow::onOperatorClicked(const QString& op) {
+    currentExpression += op.toStdString();
+    updateDisplay();
 }
 
-void CalculatorWindow::onFunctionClicked() {
-    emit keypad->functionClicked();
+void CalculatorWindow::onFunctionClicked(const QString& func) {
+    std::string funcStr = func.toStdString();
+    
+    if (funcStr == "sin") {
+        currentExpression += "sin(";
+    } else if (funcStr == "cos") {
+        currentExpression += "cos(";
+    } else if (funcStr == "tan") {
+        currentExpression += "tan(";
+    } else if (funcStr == "log") {
+        currentExpression += "log(";
+    } else if (funcStr == "ln") {
+        currentExpression += "ln(";
+    } else if (funcStr == "sqrt") {
+        currentExpression += "sqrt(";
+    } else if (funcStr == "x^y") {
+        currentExpression += "^";
+    } else if (funcStr == "x!") {
+        currentExpression += "!";
+    }
+    
+    updateDisplay();
 }
 
 void CalculatorWindow::onClearClicked() {
-    currentExpression.clear();
-    display->clearDisplay();
-    expressionLine->clear();
+currentExpression.clear();
+     display->clearDisplay();
+     expressionLine->clear();
+}
+
+void CalculatorWindow::onParenClicked(const QString& paren) {
+    if (paren == "(") {
+        currentExpression += "(";
+    } else if (paren == ")") {
+        currentExpression += ")";
+    }
+    updateDisplay();
 }
 
 void CalculatorWindow::onBackspaceClicked() {
@@ -199,10 +213,16 @@ void CalculatorWindow::onEqualsClicked() {
 
 void CalculatorWindow::onMemoryAdd() {
     try {
-        double current = engine.getMemory();
-        engine.setMemory(current + 1);
-        QString memDisplay = QString("M = %1").arg(current + 1, 0, 'f', 2);
-        display->displayResult(memDisplay);
+        double result = 0.0;
+        if (!currentExpression.isEmpty()) {
+            result = engine.calculate(currentExpression.toStdString());
+        } else {
+            result = engine.calculate(engine.getLastResult().c_str());
+        }
+        engine.addToMemory(result);
+        currentMemoryDisplay = QString("M = %1").arg(engine.getMemory(), 0, 'f', 2);
+        memoryLabelWidget->setText(currentMemoryDisplay);
+        display->displayResult(currentMemoryDisplay);
     } catch (...) {
         display->displayResult("Memory Error");
     }
@@ -210,26 +230,59 @@ void CalculatorWindow::onMemoryAdd() {
 
 void CalculatorWindow::onMemorySubtract() {
     try {
-        double current = engine.getMemory();
-        engine.setMemory(current - 1);
-        QString memDisplay = QString("M = %1").arg(current - 1, 0, 'f', 2);
-        display->displayResult(memDisplay);
+        double result = 0.0;
+        if (!currentExpression.isEmpty()) {
+            result = engine.calculate(currentExpression.toStdString());
+        } else {
+            result = engine.calculate(engine.getLastResult().c_str());
+        }
+        engine.subtractFromMemory(result);
+        currentMemoryDisplay = QString("M = %1").arg(engine.getMemory(), 0, 'f', 2);
+        memoryLabelWidget->setText(currentMemoryDisplay);
+        display->displayResult(currentMemoryDisplay);
     } catch (...) {
         display->displayResult("Memory Error");
     }
 }
 
-void CalculatorWindow::onMemoryRecall() {
-    display->displayResult(QString::number(engine.getMemory()));
-}
-
 void CalculatorWindow::onMemoryStore() {
     try {
-        std::string storedValue = engine.getLastResult();
-        QString memDisplay = QString("Memory stored: %1").arg(QString::fromStdString(storedValue));
-        display->displayResult(memDisplay);
+        double result = 0.0;
+        if (!currentExpression.isEmpty()) {
+            result = engine.calculate(currentExpression.toStdString());
+            engine.storeMemory(currentExpression.toStdString());
+            currentExpression.clear();
+            currentMemoryDisplay = QString("M = %1").arg(result, 0, 'f', 2);
+        } else {
+            engine.storeMemory("0");
+            currentMemoryDisplay = "M = 0.00";
+        }
+        memoryLabelWidget->setText(currentMemoryDisplay);
+        display->displayResult(currentMemoryDisplay);
     } catch (...) {
         display->displayResult("Store Error");
+    }
+}
+
+void CalculatorWindow::onMemoryRecall() {
+    try {
+        double mem = engine.getMemory();
+        QString memStr = QString::number(mem, 'g', 10);
+        currentExpression = memStr;
+        updateDisplay();
+    } catch (...) {
+        display->displayResult("Recall Error");
+    }
+}
+
+void CalculatorWindow::onMemoryClear() {
+    try {
+        engine.setMemory(0.0);
+        currentMemoryDisplay = "M = 0.00";
+        memoryLabelWidget->setText(currentMemoryDisplay);
+        display->displayResult(currentMemoryDisplay);
+    } catch (...) {
+        display->displayResult("Memory Error");
     }
 }
 
@@ -251,11 +304,36 @@ void CalculatorWindow::updateDisplay() {
 }
 
 void CalculatorWindow::updateHistory() {
-    QString history = QString::fromStdString(engine.getHistory());
     QTextEdit* historyText = historyArea->findChild<QTextEdit*>();
-    if (historyText) {
-        historyText->setText(history);
+    if (!historyText) return;
+    
+    QString formattedHistory;
+    std::string history = engine.getHistory();
+    
+    size_t start = 0;
+    size_t pos = 0;
+    
+    while ((pos = history.find('\n', start)) != std::string::npos) {
+        std::string line = history.substr(start, pos - start);
+        start = pos + 1;
+        
+        if (line.empty()) continue;
+        
+        size_t equalPos = line.find('=');
+        if (equalPos > 0) {
+            QString expression = QString::fromStdString(line.substr(0, equalPos));
+            QString result = QString::fromStdString(line.substr(equalPos + 1));
+            formattedHistory += QString("<div style='color: #d4d4d4; margin: 2px;'>%1 = <span style='color: #4CAF50;'>%2</span></div>")
+                                .arg(expression).arg(result);
+        }
     }
+    
+    if (formattedHistory.isEmpty()) {
+        formattedHistory = "<div style='color: #888;'>No history yet</div>";
+    }
+    
+    historyText->setText(formattedHistory);
+    historyText->setMaximumHeight(400);
 }
 
 void CalculatorWindow::loadSettings() {

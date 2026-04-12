@@ -2,12 +2,13 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <memory>
 #include <QFont>
 #include <QPalette>
 
 namespace qwencalc {
 
-DisplayWidget::DisplayWidget(QWidget* parent)
+  DisplayWidget::DisplayWidget(QWidget* parent)
     : QWidget(parent) {
     resultLabel = new QLineEdit(this);
     expressionLabel = new QLineEdit(this);
@@ -24,7 +25,6 @@ DisplayWidget::DisplayWidget(QWidget* parent)
     
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setMargin(0);
     
     QVBoxLayout* displayBox = new QVBoxLayout();
     displayBox->addWidget(expressionLabel);
@@ -35,12 +35,9 @@ DisplayWidget::DisplayWidget(QWidget* parent)
     
     setMinimumHeight(200);
     
-    setPalette(QPalette());
     QPalette bgPalette = palette();
-    bgPalette.setColor(QPalette::Window(Qt::gray));
+    bgPalette.setColor(QPalette::Window, Qt::black);
     setPalette(bgPalette);
-    
-    expressionLabel->setPlaceholderTextColor(Qt::gray);
     
     connect(resultLabel, &QLineEdit::textChanged, this, &DisplayWidget::onTextChanged);
     connect(expressionLabel, &QLineEdit::textChanged, this, &DisplayWidget::onTextChanged);
@@ -60,15 +57,25 @@ void DisplayWidget::clearDisplay() {
 }
 
 void DisplayWidget::setTheme(const QString& themeName) {
-    QPalette bgPalette = palette();
-    bgPalette.setColor(QPalette::Window(Qt::black));
-    setPalette(bgPalette);
-    
-    resultLabel->setPlaceholderTextColor(Qt::white);
-    expressionLabel->setPlaceholderTextColor(Qt::gray);
-    
-    expressionLabel->setStyleSheet("QLineEdit { color: gray; }");
-    resultLabel->setStyleSheet("QLineEdit { color: white; font-size: 36px; }");
+    if (themeName == "light") {
+        QPalette bgPalette = palette();
+        bgPalette.setColor(QPalette::Window, QColor("#f0f0f0"));
+        setPalette(bgPalette);
+        resultLabel->setStyleSheet("QLineEdit { color: #000000; font-size: 36px; }");
+        expressionLabel->setStyleSheet("QLineEdit { color: #333333; }");
+    } else if (themeName == "blue") {
+        QPalette bgPalette = palette();
+        bgPalette.setColor(QPalette::Window, QColor("#1a2a4a"));
+        setPalette(bgPalette);
+        resultLabel->setStyleSheet("QLineEdit { color: #ffffff; font-size: 36px; }");
+        expressionLabel->setStyleSheet("QLineEdit { color: #aaddff; }");
+    } else {
+        QPalette bgPalette = palette();
+        bgPalette.setColor(QPalette::Window, QColor("#1e1e1e"));
+        setPalette(bgPalette);
+        resultLabel->setStyleSheet("QLineEdit { color: #ffffff; font-size: 36px; }");
+        expressionLabel->setStyleSheet("QLineEdit { color: #888888; }");
+    }
 }
 
 void DisplayWidget::setTextColor(const QColor& color) {
@@ -78,7 +85,7 @@ void DisplayWidget::setTextColor(const QColor& color) {
 
 void DisplayWidget::setBackgroundColor(const QColor& color) {
     QPalette bgPalette = palette();
-    bgPalette.setColor(QPalette::Window(color));
+    bgPalette.setColor(QPalette::Window, color);
     setPalette(bgPalette);
 }
 
@@ -91,6 +98,10 @@ QString DisplayWidget::getExpression() const {
 }
 
 void DisplayWidget::onTextChanged() {
+    QString text = resultLabel->text();
+    if (text.isEmpty()) {
+        expressionLabel->clear();
+    }
 }
 
 } // namespace qwencalc
