@@ -4,12 +4,22 @@
 
 ```
 [Project Root]/
-├── src/              # Main source code
-│   └── App/          # Application module
-│       └── src/      # Application source files
-│           ├── main.cpp
-│           ├── calculatorapp.cpp
-│           └── calculatorapp.h
+├── src/              # Application entry point
+│   └── main.cpp      # Qt application initialization
+├── backend/          # Core calculator logic
+│   ├── CalculatorEngine.h/.cpp
+│   ├── ExpressionParser.h/.cpp
+│   └── HistoryManager.h/.cpp
+├── frontend/         # Qt6 GUI components
+│   ├── CalculatorWindow.h/.cpp
+│   ├── DisplayWidget.h/.cpp
+│   ├── KeypadWidget.h/.cpp
+│   └── ThemeManager.h/.cpp
+├── tests/            # Unit and integration tests
+│   ├── test_CalculatorEngine.cpp
+│   ├── test_ExpressionParser.cpp
+│   ├── test_HistoryManager.cpp
+│   └── test_integration.cpp
 ├── build/            # Build directory
 ├── CMakeLists.txt    # CMake configuration
 ├── .gitignore        # Git ignore rules
@@ -46,54 +56,40 @@
 
 ## 3. Core Components
 
-### 3.1. CalculatorApp
+### 3.1. CalculatorWindow
 
-**Name:** Calculator Application
+**Name:** Main Window and Application Controller
 
-**Description:** A desktop calculator application providing a graphical user interface for mathematical calculations. The main window contains a display area showing formula and results, a numeric keypad, and a history panel for reviewing past calculations.
+**Description:** The central UI component that manages the calculator interface, handles user input, and coordinates between the display, keypad, and engine components.
 
-**Technologies:** C++ (Qt6), Widgets, Core
+**Technologies:** C++ (Qt6), QMainWindow, QScrollArea
 
 **Deployment:** Local desktop application
 
 **Responsibilities:**
 - Window management and layout
 - User input handling (mouse and keyboard)
+- Signal/slot connections between UI components
 - Theme switching (light/dark modes)
 - History panel display and interaction
-- Menu and toolbar operations
+- Settings persistence (load on startup, save on close)
 
-### 3.2. calculatorapp.h/cpp
-
-**Name:** Main Application Logic
-
-**Description:** Contains the core calculator window implementation, UI component management, signal/slot connections, and application state handling.
-
-**Technologies:** Qt6::Widgets, Qt6::Core, C++17, Signals/Slots
-
-**Deployment:** N/A (part of application)
-
-**Key Methods:**
-- `setupUI()` - Initialize all UI components
-- `setupConnections()` - Connect signals and slots
-- `onEqualsClicked()` - Trigger calculation
-- `onMemoryAdd()` / `onMemorySubtract()` - Memory operations
-- `onHistoryToggled()` - Show/hide history panel
-
-### 3.3. CalculatorEngine
+### 3.2. CalculatorEngine
 
 **Name:** Calculation Engine
 
-**Description:** Core calculation logic that performs arithmetic and mathematical operations with precision handling and error management.
+**Description:** Core calculation logic that performs arithmetic and mathematical operations with precision handling and error management. Acts as the coordinator between the parser and history manager.
 
 **Technologies:** C++, STL, CMath
 
 **Responsibilities:**
 - Basic arithmetic (+, -, *, /, %)
-- Advanced functions (sqrt, sin, cos, tan, log, power)
+- Advanced functions (sqrt, sin, cos, tan, log, ln, pow)
+- Power operator (^) support
 - Memory storage and recall
 - Result precision management
 - Division by zero and overflow handling
+- Result formatting with configurable precision
 
 ### 3.4. ExpressionParser
 
@@ -127,40 +123,42 @@
 
 **Name:** Display Widget
 
-**Description:** Dual-line display showing current formula and calculated result.
+**Description:** Dual-line display showing current formula and calculated result using two QLineEdit fields.
 
 **Technologies:** Qt6::Widgets
 
 **Components:**
-- `resultLabel` - Shows calculated result
-- `expressionLabel` - Shows current formula
+- `resultLabel` - Shows calculated result (36px bold font)
+- `expressionLabel` - Shows current formula (14px font)
 
 ### 3.7. KeypadWidget
 
 **Name:** Numeric Keypad Widget
 
-**Description:** Custom button grid for numeric input and operations.
+**Description:** Custom button grid for numeric input and operations using QGridLayout.
 
 **Technologies:** Qt6::Widgets, QGridLayout
 
 **Components:**
 - Numeric buttons (0-9)
 - Operator buttons (+, -, *, /)
-- Function buttons (sin, cos, tan, sqrt, log)
-- Memory buttons (MC, MR, M+, M-)
+- Function buttons (sin, cos, tan, sqrt, log, ln, pow, x!)
+- Memory buttons (MC, MR, MS, M+, M-)
 - Clear, backspace, equals buttons
+- Parentheses buttons ((), )
 
 ### 3.8. ThemeManager
 
 **Name:** Theme Management System
 
-**Description:** Manages application-wide theme switching between light and dark modes.
+**Description:** Manages application-wide theme switching between light, dark, and blue modes.
 
-**Technologies:** Qt6::Widgets (QStyleSheet)
+**Technologies:** Qt6::Widgets (QStyleSheet, QPalette)
 
 **Themes:**
 - Light theme (white background)
 - Dark theme (#1e1e1e background)
+- Blue theme (#1a2a4a background)
 
 ## 4. Data Stores
 
@@ -263,25 +261,36 @@
 
 ## 9. Future Considerations / Roadmap
 
-### Version 0.2.0
-- [ ] Add scientific notation for very large/small numbers
-- [ ] Implement degree/radian mode toggle for trig functions
-- [ ] Add parentheses support for complex expressions
-- [ ] Implement power function (x^y)
-- [ ] Add logarithmic functions (log10, ln)
+### Version 0.2.0 (COMPLETED)
+- [x] Power function (x^y) - implemented ^ operator
+- [x] Logarithmic functions (log10, ln)
+- [x] Trigonometric functions (sin, cos, tan) with inverse functions
+- [x] Square root (sqrt)
+- [x] Factorial (x!)
+- [x] Parentheses support for complex expressions
+- [x] Scientific notation support
+- [x] Degree/radian mode toggle for trig functions
 
 ### Version 0.3.0
 - [ ] Implement complex number support
 - [ ] Add statistical functions (mean, median, std dev)
 - [ ] Implement equation solving
 - [ ] Add unit conversion
+- [ ] Code coverage measurement (gcov/lcov)
+
+### Version 0.4.0
+- [ ] Keyboard shortcuts for all operations (currently numbers, operators, Enter, Backspace, Escape implemented)
+- [ ] Undo/redo for expression editing
+- [ ] Syntax highlighting for expressions
+- [ ] Search within history
+- [ ] Export history to file
 
 ### Version 1.0.0
-- [ ] Add syntax highlighting for expressions
-- [ ] Implement search within history
-- [ ] Add export history to file
-- [ ] Add undo/redo for expression editing
-- [ ] Add customizable keyboard shortcuts
+- [ ] Stable API and documentation
+- [ ] Cross-platform testing
+- [ ] Package distribution (deb, rpm, AppImage)
+- [ ] Accessibility improvements
+- [ ] Localization support
 
 ## 10. Project Identification
 
@@ -291,7 +300,7 @@
 
 **Primary Contact/Team:** segin (Kirn Gill II)
 
-**Date of Last Update:** 2026-04-10
+**Date of Last Update:** 2026-04-20
 
 ## 11. Glossary / Acronyms
 

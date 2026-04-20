@@ -110,61 +110,26 @@ factorial(5) = 120
 
 - Numbers 0-9: Enter numbers
 - +, -, *, /: Enter operators
-- Enter: Calculate result
+- Enter / =: Calculate result
 - Backspace: Delete last character
 - Escape: Clear display
-- m: Memory add
-- n: Memory subtract
-- r: Memory recall
-- s: Memory store
+- ( / ): Parentheses
 
-## Building from Subagent
+## Testing
 
-### Backend Logic Agent
+Run tests with CTest:
 
-The backend consists of three main components:
+```bash
+cd build
+ctest --output-on-failures
+```
 
-1. **ExpressionParser** - Mathematical expression parsing with support for:
-   - Standard arithmetic operators
-   - Trigonometric functions
-   - Logarithmic functions
-   - Factorial
-   - Parentheses and scientific notation
+Or build and run individual tests:
 
-2. **CalculatorEngine** - Core calculation logic with:
-   - Precision control
-   - Error handling
-   - Result caching
-
-3. **HistoryManager** - Calculation history tracking:
-   - Stores expression-result pairs
-   - Configurable history limit
-   - Export history functionality
-
-### Frontend UI Agent
-
-The Qt-based UI consists of:
-
-1. **CalculatorWindow** - Main application window
-2. **DisplayWidget** - Result and expression display
-3. **KeypadWidget** - Numeric keypad with function buttons
-4. **ThemeManager** - Theme and color management
-
-### Testing Agent
-
-Unit tests cover:
-- ExpressionParser accuracy
-- Edge cases (division by zero, overflow)
-- Function correctness
-- Integration tests
-
-### Build & Deployment Agent
-
-CMake configuration includes:
-- Cross-platform support
-- Qt6 integration
-- Test framework setup
-- CI/CD ready
+```bash
+cd build
+./test_qwencalc
+```
 
 ## License
 
