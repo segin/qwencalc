@@ -67,9 +67,9 @@ TEST_F(ExpressionParserTest, Modulo) {
 
 TEST_F(ExpressionParserTest, TrigonometricFunctions) {
     EXPECT_NEAR(parser.parse("sin(0)"), 0.0, 1e-10);
-    EXPECT_NEAR(parser.parse("sin(M_PI/2)"), 1.0, 1e-10);
+    EXPECT_NEAR(parser.parse("sin(90)"), 1.0, 1e-10);
     EXPECT_NEAR(parser.parse("cos(0)"), 1.0, 1e-10);
-    EXPECT_NEAR(parser.parse("tan(M_PI/4)"), 1.0, 1e-10);
+    EXPECT_NEAR(parser.parse("tan(45)"), 1.0, 1e-10);
 }
 
 TEST_F(ExpressionParserTest, Logarithm) {
@@ -129,7 +129,7 @@ TEST_F(ExpressionParserTest, ScientificNotation) {
 }
 
 TEST_F(ExpressionParserTest, ComplexExpression) {
-    EXPECT_DOUBLE_EQ(parser.parse("sin(PI/2) + cos(0)"), 2.0);
+    EXPECT_DOUBLE_EQ(parser.parse("sin(90) + cos(0)"), 2.0);
     EXPECT_DOUBLE_EQ(parser.parse("2 * (3 + 4) / 2"), 7.0);
 }
 

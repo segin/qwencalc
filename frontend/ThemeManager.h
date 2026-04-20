@@ -12,6 +12,7 @@ namespace qwencalc {
 class ThemeManager {
 public:
     ThemeManager();
+    ~ThemeManager();
     
     void loadTheme(const QString& themeName);
     void saveTheme(const QString& themeName);

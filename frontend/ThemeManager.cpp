@@ -4,8 +4,12 @@
 namespace qwencalc {
 
 ThemeManager::ThemeManager()
-    : currentTheme("dark") {
+    : currentTheme("dark"), settings(nullptr) {
     initializeDefaultThemes();
+}
+
+ThemeManager::~ThemeManager() {
+    delete settings;
 }
 
 void ThemeManager::initializeDefaultThemes() {

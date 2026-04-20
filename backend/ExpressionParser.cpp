@@ -385,16 +385,16 @@ double ExpressionParser::parseFactor(int& pos) const {
                 pos++;
                 
                 if (func == "sin") {
-                    value = std::sin(operand);
+                    value = std::sin(operand * M_PI / 180.0);
                 } else if (func == "sqrt") {
                     if (operand < 0) {
                         throw ExpressionError("Square root of negative number");
                     }
                     value = std::sqrt(operand);
                 } else if (func == "cos") {
-                    value = std::cos(operand);
+                    value = std::cos(operand * M_PI / 180.0);
                 } else if (func == "tan") {
-                    value = std::tan(operand);
+                    value = std::tan(operand * M_PI / 180.0);
                 } else if (func == "ln") {
                     if (operand <= 0) {
                         throw ExpressionError("Natural logarithm of non-positive number");

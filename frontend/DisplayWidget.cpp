@@ -8,7 +8,7 @@
 
 namespace qwencalc {
 
-  DisplayWidget::DisplayWidget(QWidget* parent)
+    DisplayWidget::DisplayWidget(QWidget* parent)
     : QWidget(parent) {
     resultLabel = new QLineEdit(this);
     expressionLabel = new QLineEdit(this);

@@ -72,8 +72,6 @@ void CalculatorWindow::setupUI() {
     QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
     
     display = new DisplayWidget(centralWidget);
-    expressionLine = new QLineEdit(centralWidget);
-    expressionLine->setPlaceholderText("Enter expression...");
     currentMemoryDisplay = "M = 0.00";
     memoryLabelWidget = new QLabel(currentMemoryDisplay, centralWidget);
     memoryLabelWidget->setStyleSheet("QLabel { color: #ff9800; font-weight: bold; font-size: 14px; }");
@@ -81,7 +79,6 @@ void CalculatorWindow::setupUI() {
     QGroupBox* displayGroup = new QGroupBox("Display");
     QVBoxLayout* displayLayout = new QVBoxLayout();
     displayLayout->addWidget(display);
-    displayLayout->addWidget(expressionLine);
     displayLayout->addWidget(memoryLabelWidget);
     displayGroup->setLayout(displayLayout);
     mainLayout->addWidget(displayGroup);
@@ -103,13 +100,14 @@ void CalculatorWindow::setupUI() {
     historyLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 14px; }");
     historyLayout->addWidget(historyLabel);
     
-    QTextEdit* historyTextEdit = new QTextEdit();
-    historyTextEdit->setStyleSheet("QTextEdit { background-color: #2d2d2d; color: #d4d4d4; }");
-    historyTextEdit->setReadOnly(true);
-    historyTextEdit->setMaximumHeight(400);
-    historyTextEdit->setAcceptRichText(false);
+    QTextEdit* histEdit = new QTextEdit();
+    histEdit->setStyleSheet("QTextEdit { background-color: #2d2d2d; color: #d4d4d4; }");
+    histEdit->setReadOnly(true);
+    histEdit->setMaximumHeight(400);
+    histEdit->setAcceptRichText(false);
+    historyTextEdit = histEdit;
     
-    historyLayout->addWidget(historyTextEdit);
+    historyLayout->addWidget(histEdit);
     historyArea->setWidget(historyFrame);
     keypadLayout->addWidget(historyArea);
     
@@ -211,10 +209,9 @@ void CalculatorWindow::onFunctionClicked(const QString& func) {
     updateDisplay();
 }
 
-void CalculatorWindow::onClearClicked() {
-currentExpression.clear();
-     display->clearDisplay();
-     expressionLine->clear();
+   void CalculatorWindow::onClearClicked() {
+    currentExpression.clear();
+    display->clearDisplay();
 }
 
 void CalculatorWindow::onParenClicked(const QString& paren) {
@@ -233,7 +230,7 @@ void CalculatorWindow::onBackspaceClicked() {
     }
 }
 
-void CalculatorWindow::onEqualsClicked() {
+    void CalculatorWindow::onEqualsClicked() {
     double result;
     try {
         result = engine.calculate(currentExpression.toStdString());
@@ -245,7 +242,6 @@ void CalculatorWindow::onEqualsClicked() {
     std::string resultStr = engine.formatResult(result);
     QString displayResult(QString::fromStdString(resultStr));
     display->displayResult(displayResult);
-    expressionLine->setText(currentExpression + " = " + QString::fromStdString(resultStr));
     
     updateHistory();
     
@@ -339,15 +335,11 @@ void CalculatorWindow::onThemeChanged() {
     applyTheme(dark ? "dark" : "light");
 }
 
-void CalculatorWindow::updateDisplay() {
+ void CalculatorWindow::updateDisplay() {
     display->displayResult(currentExpression);
-    expressionLine->setText(currentExpression);
 }
 
 void CalculatorWindow::updateHistory() {
-    QTextEdit* historyText = historyArea->findChild<QTextEdit*>();
-    if (!historyText) return;
-    
     QString formattedHistory;
     std::string history = engine.getHistory();
     
@@ -373,8 +365,8 @@ void CalculatorWindow::updateHistory() {
         formattedHistory = "<div style='color: #888;'>No history yet</div>";
     }
     
-    historyText->setText(formattedHistory);
-    historyText->setMaximumHeight(400);
+    historyTextEdit->setText(formattedHistory);
+    historyTextEdit->setMaximumHeight(400);
 }
 
 void CalculatorWindow::loadSettings() {

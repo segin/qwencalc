@@ -5,6 +5,7 @@
 #include <QString>
 #include <QLineEdit>
 #include <QScrollArea>
+#include <QTextEdit>
 #include <QApplication>
 #include "DisplayWidget.h"
 #include "KeypadWidget.h"
@@ -43,7 +44,7 @@ private:
     DisplayWidget* display;
     KeypadWidget* keypad;
     QScrollArea* historyArea;
-    QLineEdit* expressionLine;
+    QTextEdit* historyTextEdit;
 
     CalculatorEngine engine;
     ThemeManager themeManager;
