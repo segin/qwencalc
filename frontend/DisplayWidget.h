@@ -41,5 +41,3 @@ private:
 };
 
 } // namespace qwencalc
-
-#endif // DISPLAY_WIDGET_H

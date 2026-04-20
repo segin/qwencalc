@@ -34,8 +34,7 @@ TEST_F(CalculatorEngineTest, ComplexExpression) {
 }
 
 TEST_F(CalculatorEngineTest, DivisionByZero) {
-    double result = engine.calculate("5 / 0");
-    EXPECT_TRUE(result != 0.0 || engine.calculate("0/1") == 0.0);
+    EXPECT_THROW(engine.calculate("5 / 0"), qwencalc::ExpressionError);
 }
 
 TEST_F(CalculatorEngineTest, InvalidExpression) {

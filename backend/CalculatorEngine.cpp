@@ -13,27 +13,13 @@ CalculatorEngine::CalculatorEngine()
 double CalculatorEngine::calculate(const std::string& expression) {
     double result = 0.0;
     
-    try {
-        result = parser.parse(expression);
-        lastResult = std::to_string(result);
-        lastExpression = expression;
-        
-        historyManager.addEntry(expression, result);
-        return result;
-    } catch (const ExpressionError& e) {
-        lastResult = "Error";
-        lastExpression = expression;
-        historyManager.addEntry(expression, 0.0);
-        
-        std::string msg = e.what();
-        if (msg.find("Division by zero") == 0 || msg.find("Modulo by zero") == 0) {
-            result = 0.0;
-            historyManager.addEntry(expression, 0.0);
-            return result;
-        }
-        
-        throw;
-    }
+    result = parser.parse(expression);
+    result = applyRounding(result);
+    lastResult = std::to_string(result);
+    lastExpression = expression;
+    
+    historyManager.addEntry(expression, result);
+    return result;
 }
 
 void CalculatorEngine::clear() {
@@ -74,6 +60,23 @@ std::string CalculatorEngine::getHistory() const {
 
 std::string CalculatorEngine::getLastResult() const {
     return lastResult;
+}
+
+std::string CalculatorEngine::formatResult(double value) {
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(precision) << value;
+    
+    std::string result = ss.str();
+    
+    std::string trimmed = result;
+    while (trimmed.size() > 1 && trimmed.back() == '0') {
+        trimmed.pop_back();
+    }
+    if (trimmed.size() > 1 && trimmed.back() == '.') {
+        trimmed.pop_back();
+    }
+    
+    return trimmed;
 }
 
 std::string CalculatorEngine::getLastExpression() const {

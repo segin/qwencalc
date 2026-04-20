@@ -13,6 +13,9 @@
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QShortcut>
+#include <QSettings>
+#include <QCloseEvent>
 
 namespace qwencalc {
 
@@ -20,9 +23,48 @@ CalculatorWindow::CalculatorWindow(QWidget* parent)
     : QMainWindow(parent), historyVisible(false) {
     setupUI();
     setupConnections();
+    setupShortcuts();
+    loadSettings();
 }
 
 CalculatorWindow::~CalculatorWindow() {}
+
+void CalculatorWindow::setupShortcuts() {
+    // Number keys and operators from the main keyboard
+    new QShortcut(QKeySequence("0"), this, this, [this]() { currentExpression += "0"; updateDisplay(); });
+    new QShortcut(QKeySequence("1"), this, this, [this]() { currentExpression += "1"; updateDisplay(); });
+    new QShortcut(QKeySequence("2"), this, this, [this]() { currentExpression += "2"; updateDisplay(); });
+    new QShortcut(QKeySequence("3"), this, this, [this]() { currentExpression += "3"; updateDisplay(); });
+    new QShortcut(QKeySequence("4"), this, this, [this]() { currentExpression += "4"; updateDisplay(); });
+    new QShortcut(QKeySequence("5"), this, this, [this]() { currentExpression += "5"; updateDisplay(); });
+    new QShortcut(QKeySequence("6"), this, this, [this]() { currentExpression += "6"; updateDisplay(); });
+    new QShortcut(QKeySequence("7"), this, this, [this]() { currentExpression += "7"; updateDisplay(); });
+    new QShortcut(QKeySequence("8"), this, this, [this]() { currentExpression += "8"; updateDisplay(); });
+    new QShortcut(QKeySequence("9"), this, this, [this]() { currentExpression += "9"; updateDisplay(); });
+    
+    // Operators
+    new QShortcut(QKeySequence("+"), this, this, [this]() { currentExpression += "+"; updateDisplay(); });
+    new QShortcut(QKeySequence("-"), this, this, [this]() { currentExpression += "-"; updateDisplay(); });
+    new QShortcut(QKeySequence("*"), this, this, [this]() { currentExpression += "*"; updateDisplay(); });
+    new QShortcut(QKeySequence("/"), this, this, [this]() { currentExpression += "/"; updateDisplay(); });
+    
+    // Equals
+    new QShortcut(QKeySequence("Enter"), this, this, &CalculatorWindow::onEqualsClicked);
+    new QShortcut(QKeySequence("="), this, this, &CalculatorWindow::onEqualsClicked);
+    
+    // Backspace and Clear
+    new QShortcut(QKeySequence("Backspace"), this, this, &CalculatorWindow::onBackspaceClicked);
+    new QShortcut(QKeySequence("Escape"), this, this, &CalculatorWindow::onClearClicked);
+    
+    // Parentheses
+    new QShortcut(QKeySequence("("), this, this, [this]() { currentExpression += "("; updateDisplay(); });
+    new QShortcut(QKeySequence(")"), this, this, [this]() { currentExpression += ")"; updateDisplay(); });
+}
+
+void CalculatorWindow::closeEvent(QCloseEvent* event) {
+    saveSettings();
+    QMainWindow::closeEvent(event);
+}
 
 void CalculatorWindow::setupUI() {
     QWidget* centralWidget = new QWidget(this);
@@ -192,23 +234,22 @@ void CalculatorWindow::onBackspaceClicked() {
 }
 
 void CalculatorWindow::onEqualsClicked() {
+    double result;
     try {
-        double result = engine.calculate(currentExpression.toStdString());
-        std::string resultStr = std::to_string(result);
-        
-        QString displayResult(QString::fromStdString(resultStr));
-        display->displayResult(displayResult);
-        
-        std::string historyEntry = currentExpression.toStdString() + " = " + resultStr;
-        engine.addToMemory(result);
-        
-        updateHistory();
-        
-        currentExpression.clear();
-        displayResult.clear();
+        result = engine.calculate(currentExpression.toStdString());
     } catch (const std::exception& e) {
         display->displayResult("Error: " + QString::fromStdString(e.what()));
+        return;
     }
+    
+    std::string resultStr = engine.formatResult(result);
+    QString displayResult(QString::fromStdString(resultStr));
+    display->displayResult(displayResult);
+    expressionLine->setText(currentExpression + " = " + QString::fromStdString(resultStr));
+    
+    updateHistory();
+    
+    currentExpression.clear();
 }
 
 void CalculatorWindow::onMemoryAdd() {

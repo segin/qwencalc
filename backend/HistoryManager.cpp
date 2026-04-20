@@ -87,7 +87,7 @@ bool HistoryManager::saveToFile(const std::string& filename) {
     }
     
     for (const auto& entry : history) {
-        file << entry.expression << " " << entry.result << " " << entry.timestamp << "\n";
+        file << entry.expression << "\t" << std::setprecision(15) << entry.result << "\t" << entry.timestamp << "\n";
     }
     
     file.close();
@@ -103,16 +103,27 @@ bool HistoryManager::loadFromFile(const std::string& filename) {
     
     history.clear();
     
-    std::string expression;
-    double result;
-    time_t timestamp;
-    
-    while (file >> expression >> result >> timestamp) {
-        HistoryEntry entry;
-        entry.expression = expression;
-        entry.result = result;
-        entry.timestamp = timestamp;
-        history.push_back(entry);
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        
+        std::istringstream iss(line);
+        std::string expression;
+        std::string resultStr;
+        std::string timestampStr;
+        
+        if (std::getline(iss, expression, '\t') &&
+            std::getline(iss, resultStr, '\t') &&
+            std::getline(iss, timestampStr, '\t')) {
+            
+            HistoryEntry entry;
+            entry.expression = expression;
+            entry.result = std::stod(resultStr);
+            entry.timestamp = std::stol(timestampStr);
+            history.push_back(entry);
+        }
     }
     
     file.close();

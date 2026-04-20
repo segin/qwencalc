@@ -1,9 +1,26 @@
+#define _USE_MATH_DEFINES
 #include "ExpressionParser.h"
 #include <cmath>
 #include <cctype>
 #include <string>
 
 namespace qwencalc {
+
+namespace {
+
+std::string toLower(const std::string& str) {
+    std::string result = str;
+    for (size_t i = 0; i < result.length(); i++) {
+        result[i] = std::tolower(static_cast<unsigned char>(result[i]));
+    }
+    return result;
+}
+
+bool isWordBoundary(const std::string& str, int pos) {
+    return pos >= (int)str.length() || !std::isalnum(static_cast<unsigned char>(str[pos]));
+}
+
+} // namespace
 
 ExpressionParser::ExpressionParser() {}
 
@@ -60,7 +77,7 @@ double ExpressionParser::parseTerm(int& pos) const {
         
         char c = currentExpression[pos];
         
-        if (c == '*' || c == '/' || c == '%') {
+        if (c == '*' || c == '/' || c == '%' || c == '^') {
             pos++;
             skipWhitespace(pos);
             if (pos >= (int)currentExpression.length()) {
@@ -79,6 +96,8 @@ double ExpressionParser::parseTerm(int& pos) const {
                     throw ExpressionError("Modulo by zero");
                 }
                 left = std::fmod(left, right);
+            } else if (c == '^') {
+                left = std::pow(left, right);
             }
         } else {
             break;
@@ -91,24 +110,30 @@ double ExpressionParser::parseTerm(int& pos) const {
 double ExpressionParser::parseNumber(int& pos) const {
     skipWhitespace(pos);
     
-    // Check for mathematical constants
     if (pos + 2 <= (int)currentExpression.length()) {
-        std::string substr = currentExpression.substr(pos, 2);
-        if (substr == "PI" || substr == "pi" || substr == "Pi" || substr == "pI") {
+        std::string substr2 = currentExpression.substr(pos, 2);
+        std::string substr2Lower = toLower(substr2);
+        if (substr2Lower == "pi" && isWordBoundary(currentExpression, pos + 2)) {
             pos += 2;
             return M_PI;
         }
     }
+    
     if (pos + 4 <= (int)currentExpression.length()) {
-        std::string substr = currentExpression.substr(pos, 4);
-        if (substr == "M_PI" || substr == "m_pi" || substr == "mPi" || substr == "MpI") {
+        std::string substr4 = currentExpression.substr(pos, 4);
+        std::string substr4Lower = toLower(substr4);
+        if (substr4Lower == "m_pi" && isWordBoundary(currentExpression, pos + 4)) {
             pos += 4;
             return M_PI;
         }
     }
-    if (currentExpression[pos] == 'e' || currentExpression[pos] == 'E') {
-        pos++;
-        return M_E;
+    
+    if (pos < (int)currentExpression.length()) {
+        std::string charStr = currentExpression.substr(pos, 1);
+        if ((charStr == "e" || charStr == "E") && isWordBoundary(currentExpression, pos + 1)) {
+            pos++;
+            return M_E;
+        }
     }
     
     // Track position before parsing digits
@@ -168,11 +193,12 @@ double ExpressionParser::parseNumber(int& pos) const {
             }
             
             double exponent = 1.0;
-            for (int i = 0; i < std::abs(exponentValue); i++) {
-                if (exponentValue >= 0) {
-                    exponent *= 10.0;
-                } else {
+            int absExponent = std::abs(exponentValue);
+            for (int i = 0; i < absExponent; i++) {
+                if (exponentValue < 0) {
                     exponent /= 10.0;
+                } else {
+                    exponent *= 10.0;
                 }
             }
             value *= exponent;
@@ -196,7 +222,7 @@ double ExpressionParser::parseFactor(int& pos) const {
         throw ExpressionError("Unexpected end of expression");
     }
     
-    double value;
+    double value = 0.0;
     bool hasValue = false;
     
     // Check for factorial prefix first (for "!-1" case)
@@ -270,89 +296,46 @@ double ExpressionParser::parseFactor(int& pos) const {
             pos++;
         }
         skipWhitespace(pos);
-        value = parseNumber(pos);
+        if (currentExpression[pos] == '(') {
+            value = parseExpression(pos);
+        } else {
+            value = parseNumber(pos);
+        }
         if (signCount % 2 == 1) {
             value = -value;
         }
         hasValue = true;
     } else {
         // Check for function name
-        std::string func = "";
+        std::string func;
         bool isFunction = false;
+        std::string remaining = currentExpression.substr(pos);
+        std::string remainingLower = toLower(remaining);
         
-        if (currentExpression[pos] == 's' || currentExpression[pos] == 'S') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "sin" || substr == "SIN" || substr == "Sin" || substr == "sIn" || substr == "siN") {
-                    func = "sin";
-                    isFunction = true;
-                } else if (substr == "sqr" || substr == "SQR" || substr == "Sqr" || substr == "sQr" || substr == "SqR") {
-                    func = "sqrt";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 'x' || currentExpression[pos] == 'X') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "sqrt" || substr == "SQRT" || substr == "Sqrt" || substr == "sQrt" || substr == "SqRt" || substr == "SqRT") {
-                    func = "sqrt";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 'c' || currentExpression[pos] == 'C') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "cos" || substr == "COS" || substr == "Cos" || substr == "cOs" || substr == "CoS") {
-                    func = "cos";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 't' || currentExpression[pos] == 'T') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "tan" || substr == "TAN" || substr == "Tan" || substr == "tAn" || substr == "TaN") {
-                    func = "tan";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 'l' || currentExpression[pos] == 'L') {
-            if (pos + 2 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 2);
-                if (substr == "ln" || substr == "LN" || substr == "Ln" || substr == "lN") {
-                    func = "ln";
-                    isFunction = true;
-                } else if (pos + 3 <= (int)currentExpression.length()) {
-                    std::string substr3 = currentExpression.substr(pos, 3);
-                    if (substr3 == "log" || substr3 == "LOG" || substr3 == "Log" || substr3 == "lOG" || substr3 == "LoG" || substr3 == "loG") {
-                        func = "log";
-                        isFunction = true;
-                    }
-                }
-            }
-        } else if (currentExpression[pos] == 'n' || currentExpression[pos] == 'N') {
-            if (pos + 2 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 2);
-                if (substr == "ln" || substr == "LN" || substr == "Ln" || substr == "lN") {
-                    func = "ln";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 'p' || currentExpression[pos] == 'P') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "pow" || substr == "POW" || substr == "Pow" || substr == "pOW" || substr == "PoW" || substr == "POw" || substr == "PoW") {
-                    func = "pow";
-                    isFunction = true;
-                }
-            }
-        } else if (currentExpression[pos] == 'f' || currentExpression[pos] == 'F') {
-            if (pos + 3 <= (int)currentExpression.length()) {
-                std::string substr = currentExpression.substr(pos, 3);
-                if (substr == "fac" || substr == "FAC" || substr == "Fac" || substr == "fAc" || substr == "FaC") {
-                    func = "fac";
-                    isFunction = true;
-                }
-            }
+        if (remainingLower.substr(0, 4) == "sqrt" && isWordBoundary(currentExpression, pos + 4)) {
+            func = "sqrt";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "sin" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "sin";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "cos" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "cos";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "tan" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "tan";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "log" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "log";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "pow" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "pow";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 3) == "fac" && isWordBoundary(currentExpression, pos + 3)) {
+            func = "fac";
+            isFunction = true;
+        } else if (remainingLower.substr(0, 2) == "ln" && isWordBoundary(currentExpression, pos + 2)) {
+            func = "ln";
+            isFunction = true;
         }
         
         if (isFunction) {

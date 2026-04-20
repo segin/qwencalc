@@ -170,8 +170,12 @@ void KeypadWidget::onButtonClick() {
         emit historyToggled();
         return;
     }
-    if (text == "+" || text == "−" || text == "×" || text == "÷" || text == "/") {
-        emit operatorClicked(text);
+    if (text == "+" || text == "−" || text == "×" || text == "÷" || text == "/" || text == "-") {
+        QString asciiOp = text;
+        if (text == "×") asciiOp = "*";
+        else if (text == "÷") asciiOp = "/";
+        else if (text == "−" || text == "-") asciiOp = "-";
+        emit operatorClicked(asciiOp);
         return;
     }
     if (text == ".") {

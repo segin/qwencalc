@@ -57,6 +57,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 # Enable testing
 enable_testing()
+add_test(NAME qwencalc_tests COMMAND qwencalc_tests)
 
 # Test configuration
 if(CMAKE_BUILD_TYPE MATCHES Debug)

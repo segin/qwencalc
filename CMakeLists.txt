@@ -10,10 +10,7 @@ project(qwencalc LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-qt6_add_resources(qwencalc_resources
-    SOURCES
-    qwencalc.qrc
-)
+qt6_add_resources(qwencalc_resources)
 
 add_executable(qwencalc
     src/main.cpp

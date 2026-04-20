@@ -54,12 +54,12 @@ private:
 
     void setupUI();
     void setupConnections();
+    void setupShortcuts();
     void updateDisplay();
     void updateHistory();
     void loadSettings();
     void saveSettings();
+    void closeEvent(QCloseEvent* event) override;
 };
 
 } // namespace qwencalc
-
-#endif // CALCULATOR_WINDOW_H

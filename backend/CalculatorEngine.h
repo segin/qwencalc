@@ -27,6 +27,8 @@ public:
     std::string getLastResult() const;
     std::string getLastExpression() const;
     
+    std::string formatResult(double value);
+    
     void setPrecision(int precision);
     int getPrecision() const;
     

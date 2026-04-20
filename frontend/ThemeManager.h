@@ -50,5 +50,3 @@ private:
 };
 
 } // namespace qwencalc
-
-#endif // THEME_MANAGER_H

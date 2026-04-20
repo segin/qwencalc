@@ -54,5 +54,3 @@ private:
 };
 
 } // namespace qwencalc
-
-#endif // KEYPAD_WIDGET_H
