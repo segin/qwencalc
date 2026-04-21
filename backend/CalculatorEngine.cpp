@@ -13,7 +13,7 @@ double CalculatorEngine::calculate(const std::string &expression) {
 
     result = parser.parse(expression);
     result = applyRounding(result);
-    lastResult = std::to_string(result);
+    lastResult = formatResult(result);
     lastExpression = expression;
 
     historyManager.addEntry(expression, result);
