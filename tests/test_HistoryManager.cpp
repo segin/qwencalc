@@ -1,22 +1,18 @@
-#include <gtest/gtest.h>
 #include "HistoryManager.h"
 #include <ctime>
 #include <fstream>
+#include <gtest/gtest.h>
 #include <limits>
 
 using namespace qwencalc;
 
 class HistoryManagerTest : public ::testing::Test {
-protected:
+  protected:
     HistoryManager manager;
-    
-    void SetUp() override {
-        manager.setMaxEntries(50);
-    }
-    
-    void TearDown() override {
-        manager.clear();
-    }
+
+    void SetUp() override { manager.setMaxEntries(50); }
+
+    void TearDown() override { manager.clear(); }
 };
 
 TEST_F(HistoryManagerTest, DefaultConstructor) {
@@ -34,19 +30,19 @@ TEST_F(HistoryManagerTest, AddMultipleEntries) {
     manager.addEntry("1 + 1", 2.0);
     manager.addEntry("3 * 3", 9.0);
     manager.addEntry("10 / 2", 5.0);
-    
+
     EXPECT_EQ(manager.size(), 3);
     EXPECT_DOUBLE_EQ(manager.getLastResult(), 5.0);
 }
 
 TEST_F(HistoryManagerTest, MaxEntriesLimit) {
     manager.setMaxEntries(3);
-    
+
     manager.addEntry("1", 1.0);
     manager.addEntry("2", 2.0);
     manager.addEntry("3", 3.0);
     manager.addEntry("4", 4.0);
-    
+
     EXPECT_EQ(manager.size(), 3);
     EXPECT_EQ(manager.getLastResult(), 4.0);
 }
@@ -54,7 +50,7 @@ TEST_F(HistoryManagerTest, MaxEntriesLimit) {
 TEST_F(HistoryManagerTest, Clear) {
     manager.addEntry("1 + 1", 2.0);
     manager.addEntry("2 + 2", 4.0);
-    
+
     manager.clear();
     EXPECT_EQ(manager.size(), 0);
 }
@@ -80,7 +76,7 @@ TEST_F(HistoryManagerTest, GetLastEntryValid) {
 TEST_F(HistoryManagerTest, GetHistory) {
     manager.addEntry("1 + 1", 2.0);
     manager.addEntry("2 + 2", 4.0);
-    
+
     std::string history = manager.getHistory();
     EXPECT_NE(history.find("1 + 1"), std::string::npos);
     EXPECT_NE(history.find("2 + 2"), std::string::npos);
@@ -89,7 +85,7 @@ TEST_F(HistoryManagerTest, GetHistory) {
 TEST_F(HistoryManagerTest, GetHistoryList) {
     manager.addEntry("1 + 1", 2.0);
     manager.addEntry("2 + 2", 4.0);
-    
+
     auto list = manager.getHistoryList();
     EXPECT_EQ(list.size(), 2);
     EXPECT_EQ(list[0], "1 + 1 = 2");
@@ -99,41 +95,41 @@ TEST_F(HistoryManagerTest, GetHistoryList) {
 TEST_F(HistoryManagerTest, SetMaxEntries) {
     manager.setMaxEntries(100);
     EXPECT_EQ(manager.getMaxEntries(), 100);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
-    
+
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
 }
 
 TEST_F(HistoryManagerTest, TimestampField) {
     manager.addEntry("1 + 1", 2.0);
-    
+
     std::vector<std::string> list = manager.getHistoryList();
     EXPECT_EQ(list.size(), 1);
 }
@@ -141,14 +137,14 @@ TEST_F(HistoryManagerTest, TimestampField) {
 TEST_F(HistoryManagerTest, SaveToFile) {
     manager.addEntry("3 + 3", 6.0);
     manager.addEntry("4 * 4", 16.0);
-    
+
     bool result = manager.saveToFile("/tmp/test_history.txt");
     EXPECT_TRUE(result);
 }
 
 TEST_F(HistoryManagerTest, LoadFromFile) {
     manager.saveToFile("/tmp/test_history_load.txt");
-    
+
     HistoryManager manager2;
     bool result = manager2.loadFromFile("/tmp/test_history_load.txt");
     EXPECT_TRUE(result);
@@ -165,4 +161,3 @@ TEST_F(HistoryManagerTest, InvalidMaxEntries) {
     manager.setMaxEntries(5);
     EXPECT_EQ(manager.getMaxEntries(), 5);
 }
-

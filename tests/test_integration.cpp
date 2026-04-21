@@ -2,8 +2,8 @@
 #include "CalculatorEngine.h"
 #include "ExpressionParser.h"
 #include "HistoryManager.h"
-#include <gtest/gtest.h>
 #include <cmath>
+#include <gtest/gtest.h>
 
 using namespace qwencalc;
 

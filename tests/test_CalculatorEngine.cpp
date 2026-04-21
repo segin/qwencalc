@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include "../backend/CalculatorEngine.h"
+#include <gtest/gtest.h>
 
 using namespace qwencalc;
 
 class CalculatorEngineTest : public ::testing::Test {
-protected:
+  protected:
     CalculatorEngine engine;
 };
 
@@ -40,7 +40,7 @@ TEST_F(CalculatorEngineTest, DivisionByZero) {
 TEST_F(CalculatorEngineTest, InvalidExpression) {
     try {
         engine.calculate("abc + def");
-    } catch (const qwencalc::ExpressionError&) {
+    } catch (const qwencalc::ExpressionError &) {
         return; // Expected
     }
     FAIL() << "Expected ExpressionError for invalid expression";
@@ -73,10 +73,10 @@ TEST_F(CalculatorEngineTest, ClearHistory) {
 TEST_F(CalculatorEngineTest, Memory) {
     engine.setMemory(100.0);
     EXPECT_DOUBLE_EQ(engine.getMemory(), 100.0);
-    
+
     engine.addToMemory(50.0);
     EXPECT_DOUBLE_EQ(engine.getMemory(), 150.0);
-    
+
     engine.subtractFromMemory(25.0);
     EXPECT_DOUBLE_EQ(engine.getMemory(), 125.0);
 }
@@ -90,4 +90,3 @@ TEST_F(CalculatorEngineTest, ValidExpression) {
     EXPECT_TRUE(engine.isValidExpression("3 + 4"));
     EXPECT_FALSE(engine.isValidExpression("abc + def"));
 }
-

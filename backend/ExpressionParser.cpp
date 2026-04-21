@@ -1,14 +1,41 @@
 #define _USE_MATH_DEFINES
 #include "ExpressionParser.h"
-#include <cmath>
 #include <cctype>
+#include <cmath>
 #include <string>
 
 namespace qwencalc {
 
 namespace {
 
-std::string toLower(const std::string& str) {
+std::string normalizeExpression(const std::string &expression) {
+    std::string result;
+    result.reserve(expression.size() + 64);
+
+    for (size_t i = 0; i < expression.size(); i++) {
+        result.push_back(expression[i]);
+
+        if (i + 1 < expression.size()) {
+            char current = expression[i];
+            char next = expression[i + 1];
+
+            bool currentIsDigit =
+                std::isdigit(static_cast<unsigned char>(current));
+            bool currentIsClosing = (current == ')');
+            bool nextIsOpening = (next == '(');
+            bool nextIsDigit = std::isdigit(static_cast<unsigned char>(next));
+
+            if ((currentIsDigit || currentIsClosing) && nextIsOpening) {
+                result.push_back('*');
+            } else if (currentIsClosing && nextIsDigit) {
+                result.push_back('*');
+            }
+        }
+    }
+    return result;
+}
+
+std::string toLower(const std::string &str) {
     std::string result = str;
     for (size_t i = 0; i < result.length(); i++) {
         result[i] = std::tolower(static_cast<unsigned char>(result[i]));
@@ -16,45 +43,47 @@ std::string toLower(const std::string& str) {
     return result;
 }
 
-bool isWordBoundary(const std::string& str, int pos) {
-    return pos >= (int)str.length() || !std::isalnum(static_cast<unsigned char>(str[pos]));
+bool isWordBoundary(const std::string &str, int pos) {
+    return pos >= (int)str.length() ||
+           !std::isalnum(static_cast<unsigned char>(str[pos]));
 }
 
 } // namespace
 
 ExpressionParser::ExpressionParser() {}
 
-void ExpressionParser::skipWhitespace(int& pos) const {
-    while (pos < (int)currentExpression.length() && 
+void ExpressionParser::skipWhitespace(int &pos) const {
+    while (pos < (int)currentExpression.length() &&
            std::isspace(currentExpression[pos])) {
         pos++;
     }
 }
 
-double ExpressionParser::parse(const std::string& expression) {
-    currentExpression = expression;
-    
+double ExpressionParser::parse(const std::string &expression) {
+    currentExpression = normalizeExpression(expression);
+
     int pos = 0;
     skipWhitespace(pos);
     double result = parseExpression(pos);
-    
+
     if (pos < (int)currentExpression.length()) {
         throw ExpressionError("Unexpected characters at end");
     }
-    
+
     return result;
 }
 
-double ExpressionParser::parseExpression(int& pos) const {
+double ExpressionParser::parseExpression(int &pos) const {
     skipWhitespace(pos);
     double left = parseTerm(pos);
-    
+
     while (pos < (int)currentExpression.length()) {
         skipWhitespace(pos);
-        if (pos >= (int)currentExpression.length()) break;
-        
+        if (pos >= (int)currentExpression.length())
+            break;
+
         char c = currentExpression[pos];
-        
+
         if (c == '+' || c == '-') {
             pos++;
             double right = parseTerm(pos);
@@ -63,20 +92,21 @@ double ExpressionParser::parseExpression(int& pos) const {
             break;
         }
     }
-    
+
     return left;
 }
 
-double ExpressionParser::parseTerm(int& pos) const {
+double ExpressionParser::parseTerm(int &pos) const {
     skipWhitespace(pos);
     double left = parseFactor(pos);
-    
+
     while (pos < (int)currentExpression.length()) {
         skipWhitespace(pos);
-        if (pos >= (int)currentExpression.length()) break;
-        
+        if (pos >= (int)currentExpression.length())
+            break;
+
         char c = currentExpression[pos];
-        
+
         if (c == '*' || c == '/' || c == '%' || c == '^') {
             pos++;
             skipWhitespace(pos);
@@ -103,49 +133,52 @@ double ExpressionParser::parseTerm(int& pos) const {
             break;
         }
     }
-    
+
     return left;
 }
 
-double ExpressionParser::parseNumber(int& pos) const {
+double ExpressionParser::parseNumber(int &pos) const {
     skipWhitespace(pos);
-    
+
     if (pos + 2 <= (int)currentExpression.length()) {
         std::string substr2 = currentExpression.substr(pos, 2);
         std::string substr2Lower = toLower(substr2);
-        if (substr2Lower == "pi" && isWordBoundary(currentExpression, pos + 2)) {
+        if (substr2Lower == "pi" &&
+            isWordBoundary(currentExpression, pos + 2)) {
             pos += 2;
             return M_PI;
         }
     }
-    
+
     if (pos + 4 <= (int)currentExpression.length()) {
         std::string substr4 = currentExpression.substr(pos, 4);
         std::string substr4Lower = toLower(substr4);
-        if (substr4Lower == "m_pi" && isWordBoundary(currentExpression, pos + 4)) {
+        if (substr4Lower == "m_pi" &&
+            isWordBoundary(currentExpression, pos + 4)) {
             pos += 4;
             return M_PI;
         }
     }
-    
+
     if (pos < (int)currentExpression.length()) {
         std::string charStr = currentExpression.substr(pos, 1);
-        if ((charStr == "e" || charStr == "E") && isWordBoundary(currentExpression, pos + 1)) {
+        if ((charStr == "e" || charStr == "E") &&
+            isWordBoundary(currentExpression, pos + 1)) {
             pos++;
             return M_E;
         }
     }
-    
+
     // Track position before parsing digits
     int startpos = pos;
-    
+
     double value = 0.0;
     bool hasDecimal = false;
     int decimalDigits = 0;
-    
+
     while (pos < (int)currentExpression.length()) {
         char c = currentExpression[pos];
-        
+
         if (std::isdigit(c)) {
             if (!hasDecimal) {
                 value = value * 10.0 + (c - '0');
@@ -163,12 +196,14 @@ double ExpressionParser::parseNumber(int& pos) const {
             break;
         }
     }
-    
-    // Check for scientific notation (e or E followed by digits, with optional sign)
-    while (pos < (int)currentExpression.length() && (currentExpression[pos] == 'e' || currentExpression[pos] == 'E')) {
+
+    // Check for scientific notation (e or E followed by digits, with optional
+    // sign)
+    while (pos < (int)currentExpression.length() &&
+           (currentExpression[pos] == 'e' || currentExpression[pos] == 'E')) {
         pos++;
         skipWhitespace(pos);
-        
+
         bool isNegative = false;
         if (pos < (int)currentExpression.length()) {
             char expChar = currentExpression[pos];
@@ -177,21 +212,22 @@ double ExpressionParser::parseNumber(int& pos) const {
                 pos++;
             }
         }
-        
+
         // Read exponent digits
         int exponentValue = 0;
         bool readDigits = false;
-        while (pos < (int)currentExpression.length() && std::isdigit(currentExpression[pos])) {
+        while (pos < (int)currentExpression.length() &&
+               std::isdigit(currentExpression[pos])) {
             exponentValue = exponentValue * 10 + (currentExpression[pos] - '0');
             readDigits = true;
             pos++;
         }
-        
+
         if (readDigits) {
             if (isNegative) {
                 exponentValue = -exponentValue;
             }
-            
+
             double exponent = 1.0;
             int absExponent = std::abs(exponentValue);
             for (int i = 0; i < absExponent; i++) {
@@ -203,28 +239,28 @@ double ExpressionParser::parseNumber(int& pos) const {
             }
             value *= exponent;
         }
-        
+
         break;
     }
-    
+
     // If we didn't parse anything, throw an error
     if (startpos == pos) {
         throw ExpressionError("Invalid expression");
     }
-    
+
     return value;
 }
 
-double ExpressionParser::parseFactor(int& pos) const {
+double ExpressionParser::parseFactor(int &pos) const {
     skipWhitespace(pos);
-    
+
     if (pos >= (int)currentExpression.length()) {
         throw ExpressionError("Unexpected end of expression");
     }
-    
+
     double value = 0.0;
     bool hasValue = false;
-    
+
     // Check for factorial prefix first (for "!-1" case)
     if (currentExpression[pos] == '!') {
         pos++;
@@ -232,13 +268,14 @@ double ExpressionParser::parseFactor(int& pos) const {
         if (pos >= (int)currentExpression.length()) {
             throw ExpressionError("Invalid expression");
         }
-        
+
         // Parse what comes after the factorial operator
         double operandValue;
         if (currentExpression[pos] == '-') {
             int signCount = 0;
-            while (pos < (int)currentExpression.length() && 
-                   (currentExpression[pos] == '-' || currentExpression[pos] == '+')) {
+            while (pos < (int)currentExpression.length() &&
+                   (currentExpression[pos] == '-' ||
+                    currentExpression[pos] == '+')) {
                 if (currentExpression[pos] == '-') {
                     signCount++;
                 }
@@ -251,8 +288,9 @@ double ExpressionParser::parseFactor(int& pos) const {
             }
         } else if (currentExpression[pos] == '+') {
             int signCount = 0;
-            while (pos < (int)currentExpression.length() && 
-                   (currentExpression[pos] == '-' || currentExpression[pos] == '+')) {
+            while (pos < (int)currentExpression.length() &&
+                   (currentExpression[pos] == '-' ||
+                    currentExpression[pos] == '+')) {
                 if (currentExpression[pos] == '-') {
                     signCount++;
                 }
@@ -263,7 +301,7 @@ double ExpressionParser::parseFactor(int& pos) const {
         } else {
             operandValue = parseNumber(pos);
         }
-        
+
         int n = static_cast<int>(operandValue);
         if (n < 0) {
             throw ExpressionError("Factorial of negative number");
@@ -281,15 +319,17 @@ double ExpressionParser::parseFactor(int& pos) const {
         pos++;
         value = parseExpression(pos);
         skipWhitespace(pos);
-        if (pos >= (int)currentExpression.length() || currentExpression[pos] != ')') {
+        if (pos >= (int)currentExpression.length() ||
+            currentExpression[pos] != ')') {
             throw ExpressionError("Expected ')' after expression");
         }
         pos++;
         hasValue = true;
     } else if (currentExpression[pos] == '-' || currentExpression[pos] == '+') {
         int signCount = 0;
-        while (pos < (int)currentExpression.length() && 
-               (currentExpression[pos] == '-' || currentExpression[pos] == '+')) {
+        while (
+            pos < (int)currentExpression.length() &&
+            (currentExpression[pos] == '-' || currentExpression[pos] == '+')) {
             if (currentExpression[pos] == '-') {
                 signCount++;
             }
@@ -311,61 +351,72 @@ double ExpressionParser::parseFactor(int& pos) const {
         bool isFunction = false;
         std::string remaining = currentExpression.substr(pos);
         std::string remainingLower = toLower(remaining);
-        
-        if (remainingLower.substr(0, 4) == "sqrt" && isWordBoundary(currentExpression, pos + 4)) {
+
+        if (remainingLower.substr(0, 4) == "sqrt" &&
+            isWordBoundary(currentExpression, pos + 4)) {
             func = "sqrt";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "sin" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "sin" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "sin";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "cos" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "cos" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "cos";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "tan" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "tan" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "tan";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "log" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "log" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "log";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "pow" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "pow" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "pow";
             isFunction = true;
-        } else if (remainingLower.substr(0, 3) == "fac" && isWordBoundary(currentExpression, pos + 3)) {
+        } else if (remainingLower.substr(0, 3) == "fac" &&
+                   isWordBoundary(currentExpression, pos + 3)) {
             func = "fac";
             isFunction = true;
-        } else if (remainingLower.substr(0, 2) == "ln" && isWordBoundary(currentExpression, pos + 2)) {
+        } else if (remainingLower.substr(0, 2) == "ln" &&
+                   isWordBoundary(currentExpression, pos + 2)) {
             func = "ln";
             isFunction = true;
         }
-        
+
         if (isFunction) {
             pos += func.length();
             skipWhitespace(pos);
-            
-            if (pos >= (int)currentExpression.length() || currentExpression[pos] != '(') {
+
+            if (pos >= (int)currentExpression.length() ||
+                currentExpression[pos] != '(') {
                 throw ExpressionError("Expected '(' after " + func);
             }
             pos++;
-            
+
             double operand = parseExpression(pos);
-            
+
             skipWhitespace(pos);
-            
+
             if (func == "pow") {
-                if (pos >= (int)currentExpression.length() || currentExpression[pos] != ',') {
+                if (pos >= (int)currentExpression.length() ||
+                    currentExpression[pos] != ',') {
                     throw ExpressionError("Expected ',' in pow function");
                 }
                 pos++;
                 skipWhitespace(pos);
-                
+
                 double exponent = parseExpression(pos);
-                
+
                 skipWhitespace(pos);
-                if (pos >= (int)currentExpression.length() || currentExpression[pos] != ')') {
+                if (pos >= (int)currentExpression.length() ||
+                    currentExpression[pos] != ')') {
                     throw ExpressionError("Expected ')' after exponent");
                 }
                 pos++;
-                
+
                 value = std::pow(operand, exponent);
             } else if (func == "fac") {
                 int n = static_cast<int>(operand);
@@ -379,11 +430,13 @@ double ExpressionParser::parseFactor(int& pos) const {
                 value = result;
             } else {
                 // All other functions expect ')' after the argument
-                if (pos >= (int)currentExpression.length() || currentExpression[pos] != ')') {
-                    throw ExpressionError("Expected ')' after function argument");
+                if (pos >= (int)currentExpression.length() ||
+                    currentExpression[pos] != ')') {
+                    throw ExpressionError(
+                        "Expected ')' after function argument");
                 }
                 pos++;
-                
+
                 if (func == "sin") {
                     value = std::sin(operand * M_PI / 180.0);
                 } else if (func == "sqrt") {
@@ -397,33 +450,35 @@ double ExpressionParser::parseFactor(int& pos) const {
                     value = std::tan(operand * M_PI / 180.0);
                 } else if (func == "ln") {
                     if (operand <= 0) {
-                        throw ExpressionError("Natural logarithm of non-positive number");
+                        throw ExpressionError(
+                            "Natural logarithm of non-positive number");
                     }
                     value = std::log(operand);
                 } else if (func == "log") {
                     if (operand <= 0) {
-                        throw ExpressionError("Logarithm base 10 of non-positive number");
+                        throw ExpressionError(
+                            "Logarithm base 10 of non-positive number");
                     }
                     value = std::log10(operand);
                 }
             }
             hasValue = true;
         }
-        
+
         if (!isFunction) {
             value = parseNumber(pos);
             hasValue = true;
         }
     }
-    
+
     if (!hasValue) {
         throw ExpressionError("Invalid expression");
     }
-    
-     
+
     // Check for factorial postfix operator (!)
     skipWhitespace(pos);
-    if (pos < (int)currentExpression.length() && currentExpression[pos] == '!') {
+    if (pos < (int)currentExpression.length() &&
+        currentExpression[pos] == '!') {
         int n = static_cast<int>(value);
         if (n < 0) {
             throw ExpressionError("Factorial of negative number");
@@ -439,7 +494,7 @@ double ExpressionParser::parseFactor(int& pos) const {
         pos++;
         skipWhitespace(pos);
     }
-    
+
     return value;
 }
 

@@ -7,41 +7,41 @@
 namespace qwencalc {
 
 class CalculatorEngine {
-public:
+  public:
     CalculatorEngine();
-    
-    double calculate(const std::string& expression);
-    
+
+    double calculate(const std::string &expression);
+
     void clear();
     void clearHistory();
-    
+
     double getMemory() const;
     void setMemory(double memory);
-    
+
     void addToMemory(double value);
     void subtractFromMemory(double value);
     void recallMemory();
-    void storeMemory(const std::string& expression);
-    
+    void storeMemory(const std::string &expression);
+
     std::string getHistory() const;
     std::string getLastResult() const;
     std::string getLastExpression() const;
-    
+
     std::string formatResult(double value);
-    
+
     void setPrecision(int precision);
     int getPrecision() const;
-    
-    bool isValidExpression(const std::string& expression);
-    
-private:
+
+    bool isValidExpression(const std::string &expression);
+
+  private:
     ExpressionParser parser;
     HistoryManager historyManager;
     double memory;
     int precision;
     std::string lastResult;
     std::string lastExpression;
-    
+
     double applyRounding(double value);
 };
 

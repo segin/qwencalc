@@ -3,14 +3,11 @@
 
 namespace qwencalc {
 
-ThemeManager::ThemeManager()
-    : currentTheme("dark"), settings(nullptr) {
+ThemeManager::ThemeManager() : currentTheme("dark"), settings(nullptr) {
     initializeDefaultThemes();
 }
 
-ThemeManager::~ThemeManager() {
-    delete settings;
-}
+ThemeManager::~ThemeManager() { delete settings; }
 
 void ThemeManager::initializeDefaultThemes() {
     colors["background"] = QColor("#1e1e1e");
@@ -22,7 +19,7 @@ void ThemeManager::initializeDefaultThemes() {
     colors["displayText"] = QColor("#ffffff");
 }
 
-void ThemeManager::loadTheme(const QString& themeName) {
+void ThemeManager::loadTheme(const QString &themeName) {
     currentTheme = themeName;
     if (themeName == "light") {
         colors["background"] = QColor("#f0f0f0");
@@ -51,31 +48,30 @@ void ThemeManager::loadTheme(const QString& themeName) {
     }
 }
 
-void ThemeManager::saveTheme(const QString& themeName) {
+void ThemeManager::saveTheme(const QString &themeName) {
     currentTheme = themeName;
 }
 
-void ThemeManager::deleteTheme(const QString& themeName) {
+void ThemeManager::deleteTheme(const QString &themeName) {
     if (currentTheme == themeName) {
         initializeDefaultThemes();
         currentTheme = "dark";
     }
 }
 
-void ThemeManager::listThemes() {
+QList<QString> ThemeManager::listThemes() {
+    QList<QString> themes;
+    themes.append("dark");
+    themes.append("light");
+    themes.append("blue");
+    return themes;
 }
 
-QColor ThemeManager::getBackgroundColor() const {
-    return colors["background"];
-}
+QColor ThemeManager::getBackgroundColor() const { return colors["background"]; }
 
-QColor ThemeManager::getTextColor() const {
-    return colors["text"];
-}
+QColor ThemeManager::getTextColor() const { return colors["text"]; }
 
-QColor ThemeManager::getButtonColor() const {
-    return colors["button"];
-}
+QColor ThemeManager::getButtonColor() const { return colors["button"]; }
 
 QColor ThemeManager::getButtonHoverColor() const {
     return colors["buttonHover"];
@@ -89,49 +85,44 @@ QColor ThemeManager::getDisplayBackground() const {
     return colors["displayBackground"];
 }
 
-QColor ThemeManager::getDisplayText() const {
-    return colors["displayText"];
-}
+QColor ThemeManager::getDisplayText() const { return colors["displayText"]; }
 
-void ThemeManager::setBackgroundColor(const QColor& color) {
+void ThemeManager::setBackgroundColor(const QColor &color) {
     colors["background"] = color;
 }
 
-void ThemeManager::setTextColor(const QColor& color) {
-    colors["text"] = color;
-}
+void ThemeManager::setTextColor(const QColor &color) { colors["text"] = color; }
 
-void ThemeManager::setButtonColor(const QColor& color) {
+void ThemeManager::setButtonColor(const QColor &color) {
     colors["button"] = color;
 }
 
-void ThemeManager::setButtonHoverColor(const QColor& color) {
+void ThemeManager::setButtonHoverColor(const QColor &color) {
     colors["buttonHover"] = color;
 }
 
-void ThemeManager::setButtonPressedColor(const QColor& color) {
+void ThemeManager::setButtonPressedColor(const QColor &color) {
     colors["buttonPressed"] = color;
 }
 
-void ThemeManager::setDisplayBackground(const QColor& color) {
+void ThemeManager::setDisplayBackground(const QColor &color) {
     colors["displayBackground"] = color;
 }
 
-void ThemeManager::setDisplayText(const QColor& color) {
+void ThemeManager::setDisplayText(const QColor &color) {
     colors["displayText"] = color;
 }
 
-void ThemeManager::applyThemeToWidget(QWidget* widget) {
-    if (!widget) return;
+void ThemeManager::applyThemeToWidget(QWidget *widget) {
+    if (!widget)
+        return;
     QPalette palette;
     palette.setColor(QPalette::Window, colors["background"]);
     palette.setColor(QPalette::Text, colors["text"]);
     widget->setPalette(palette);
 }
 
-QString ThemeManager::getCurrentTheme() const {
-    return currentTheme;
-}
+QString ThemeManager::getCurrentTheme() const { return currentTheme; }
 
 QList<QString> ThemeManager::getAvailableThemes() const {
     QList<QString> themes;

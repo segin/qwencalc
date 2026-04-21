@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
 #include "ExpressionParser.h"
 #include <cmath>
+#include <gtest/gtest.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -12,7 +12,7 @@
 using namespace qwencalc;
 
 class ExpressionParserTest : public testing::Test {
-protected:
+  protected:
     ExpressionParser parser;
 };
 
@@ -49,11 +49,13 @@ TEST_F(ExpressionParserTest, DivisionByZero) {
     try {
         parser.parse("10 / 0");
         FAIL() << "Expected ExpressionError for division by zero";
-    } catch (const ExpressionError&) {}
+    } catch (const ExpressionError &) {
+    }
     try {
         parser.parse("5 / 0.0");
         FAIL() << "Expected ExpressionError for division by zero";
-    } catch (const ExpressionError&) {}
+    } catch (const ExpressionError &) {
+    }
 }
 
 TEST_F(ExpressionParserTest, Modulo) {
@@ -62,7 +64,8 @@ TEST_F(ExpressionParserTest, Modulo) {
     try {
         parser.parse("10 % 0");
         FAIL() << "Expected ExpressionError for modulo by zero";
-    } catch (const ExpressionError&) {}
+    } catch (const ExpressionError &) {
+    }
 }
 
 TEST_F(ExpressionParserTest, TrigonometricFunctions) {
@@ -91,13 +94,13 @@ TEST_F(ExpressionParserTest, Factorial) {
     try {
         double result = parser.parse("!5");
         EXPECT_DOUBLE_EQ(result, 120.0);
-    } catch (const ExpressionError&) {
+    } catch (const ExpressionError &) {
         FAIL() << "Expected factorial parsing to succeed";
     }
     try {
         double result = parser.parse("!0");
         EXPECT_DOUBLE_EQ(result, 1.0);
-    } catch (const ExpressionError&) {
+    } catch (const ExpressionError &) {
         FAIL() << "Expected factorial parsing to succeed";
     }
 }
@@ -133,7 +136,7 @@ TEST_F(ExpressionParserTest, ComplexExpression) {
     EXPECT_DOUBLE_EQ(parser.parse("2 * (3 + 4) / 2"), 7.0);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

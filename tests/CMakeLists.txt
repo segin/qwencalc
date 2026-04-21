@@ -18,10 +18,15 @@ set(BACKEND_SOURCES
     ${CMAKE_SOURCE_DIR}/backend/CalculatorEngine.cpp
     ${CMAKE_SOURCE_DIR}/backend/ExpressionParser.cpp
     ${CMAKE_SOURCE_DIR}/backend/HistoryManager.cpp
+    ${CMAKE_SOURCE_DIR}/frontend/ThemeManager.cpp
+    ${CMAKE_SOURCE_DIR}/frontend/DisplayWidget.cpp
+    ${CMAKE_SOURCE_DIR}/frontend/KeypadWidget.cpp
+    ${CMAKE_SOURCE_DIR}/frontend/CalculatorWindow.cpp
 )
 
 # Library
 add_library(qwencalc_lib STATIC ${BACKEND_SOURCES})
+target_link_libraries(qwencalc_lib PRIVATE Qt6::Core Qt6::Widgets)
 
 # Source files
 set(TEST_SOURCES
@@ -29,6 +34,7 @@ set(TEST_SOURCES
     test_ExpressionParser.cpp
     test_HistoryManager.cpp
     test_integration.cpp
+    test_frontend.cpp
 )
 
 # Test executable
